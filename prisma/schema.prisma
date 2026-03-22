@@ -1,0 +1,95 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("admin_users")
+}
+
+/// Key-value JSON blobs for hero, about, mission, curriculum, activities, why_join, SEO defaults
+model ContentSection {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  title     String?  @db.VarChar(500)
+  body      String   @db.LongText
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("content_sections")
+}
+
+model Course {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  nameHi      String   @map("name_hi") @db.VarChar(255)
+  duration    String   @db.VarChar(120)
+  objective   String   @db.Text
+  topics      String   @db.LongText
+  activities  String   @db.LongText
+  sortOrder   Int      @default(0) @map("sort_order")
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("courses")
+}
+
+model TeamMember {
+  id           String   @id @default(cuid())
+  nameHi       String   @map("name_hi") @db.VarChar(255)
+  designation  String   @db.VarChar(255)
+  description  String   @db.Text
+  photoUrl     String?  @map("photo_url") @db.VarChar(1024)
+  sortOrder    Int      @default(0) @map("sort_order")
+  published    Boolean  @default(true)
+  isFounder    Boolean  @default(false) @map("is_founder")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("team_members")
+}
+
+model ContactSubmission {
+  id        String   @id @default(cuid())
+  name      String   @db.VarChar(255)
+  email     String   @db.VarChar(255)
+  phone     String?  @db.VarChar(64)
+  message   String   @db.Text
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("contact_submissions")
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique @db.VarChar(255)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("newsletter_subscribers")
+}
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String   @db.VarChar(500)
+  excerpt     String?  @db.Text
+  body        String   @db.LongText
+  coverImage  String?  @map("cover_image") @db.VarChar(1024)
+  published   Boolean  @default(false)
+  publishedAt DateTime? @map("published_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("blog_posts")
+}

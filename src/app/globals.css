@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --saffron: #ff6b00;
+  --navy: #0b3c5d;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-slate-50 text-slate-900 antialiased;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+.hero-map-bg {
+  background-image:
+    radial-gradient(ellipse 120% 80% at 50% 0%, rgba(255, 107, 0, 0.18), transparent 55%),
+    radial-gradient(ellipse 90% 60% at 80% 60%, rgba(11, 60, 93, 0.35), transparent 50%),
+    linear-gradient(165deg, #0b3c5d 0%, #0f4d75 45%, #0b3c5d 100%);
+}
+
+.card-hover {
+  @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-xl;
+}

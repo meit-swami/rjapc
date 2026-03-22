@@ -1,0 +1,32 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+
+# build
+/.next/
+/out/
+
+# env
+.env
+.env*.local
+
+# debug
+npm-debug.log*
+
+# prisma
+# keep migrations if you add them later
+
+# uploads (keep folder)
+/public/uploads/*
+!/public/uploads/.gitkeep
+
+# IDE
+.idea
+.vscode
+*.swp
+
+# OS
+Thumbs.db
+.DS_Store

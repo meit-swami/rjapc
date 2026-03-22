@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 360" fill="none">
+  <path fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.45)" stroke-width="1.5"
+    d="M160 8 L200 40 L228 88 L248 140 L262 198 L268 248 L252 298 L220 332 L168 348 L116 332 L78 298 L54 248 L52 198 L64 140 L92 88 L128 40 Z" />
+  <path fill="rgba(255,107,0,0.25)" stroke="rgba(255,255,255,0.35)" stroke-width="1"
+    d="M160 48 L188 78 L206 118 L214 162 L210 206 L190 246 L160 268 L130 246 L110 206 L106 162 L114 118 L132 78 Z" />
+</svg>
