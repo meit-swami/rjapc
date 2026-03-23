@@ -9,6 +9,8 @@ type Hero = {
   backgroundImageUrl?: string | null;
 };
 
+const tricolorPhrases = ["उत्कृष्ट भारत", "समृद्ध भारत", "श्रेष्ठ भारत"];
+
 export function HeroSection({ hero }: { hero: Hero }) {
   return (
     <section className="relative overflow-hidden">
@@ -43,11 +45,25 @@ export function HeroSection({ hero }: { hero: Hero }) {
               <span className="h-2 w-2 animate-pulse rounded-full bg-saffron" />
               राजनीतिक करियर संस्थान
             </p>
-            <h1 className="font-devanagari text-4xl font-extrabold leading-tight text-white text-balance md:text-5xl lg:text-6xl">
+            <h1 className="font-devanagari text-3xl font-extrabold leading-tight text-white text-balance md:text-4xl lg:text-5xl">
               {hero.title}
             </h1>
-            <p className="mt-4 max-w-2xl text-lg text-white/90 md:text-xl font-devanagari">{hero.subtitle}</p>
-            <p className="mt-3 max-w-2xl text-base text-white/80 md:text-lg font-devanagari">{hero.tagline}</p>
+            <p className="mt-4 max-w-2xl text-base text-white/90 md:text-lg font-devanagari">{hero.subtitle}</p>
+            <p className="mt-2 max-w-2xl text-sm text-white/80 md:text-base font-devanagari">{hero.tagline}</p>
+            <div className="mt-8 max-w-lg rounded-2xl border border-white/20 bg-white/10 p-4 backdrop-blur-sm">
+              <p className="text-xs uppercase tracking-[0.18em] text-white/70">Vision</p>
+              <div className="tricolor-rotator mt-3 h-12 overflow-hidden">
+                {tricolorPhrases.map((phrase, idx) => (
+                  <span
+                    key={phrase}
+                    className="tricolor-phrase font-devanagari text-3xl font-bold md:text-4xl"
+                    style={{ animationDelay: `${idx * 3}s` }}
+                  >
+                    {phrase}
+                  </span>
+                ))}
+              </div>
+            </div>
             <div className="mt-10 flex flex-wrap gap-4">
               <Link
                 href="#programs"
@@ -63,11 +79,11 @@ export function HeroSection({ hero }: { hero: Hero }) {
               </Link>
             </div>
           </Reveal>
-          <div className="mt-14 hidden justify-end md:flex">
-            <div className="relative h-40 w-64 animate-float opacity-90 lg:h-48 lg:w-80">
+          <div className="mt-8 hidden justify-end md:flex">
+            <div className="hero-logo-wrap relative h-[22rem] w-[22rem] opacity-95 lg:h-[32rem] lg:w-[32rem]">
               <Image
-                src="/india-outline.svg"
-                alt=""
+                src="/uploads/logo.png"
+                alt="RJAPC Logo"
                 fill
                 className="object-contain drop-shadow-2xl"
                 priority
