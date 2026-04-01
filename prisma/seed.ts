@@ -207,58 +207,60 @@ async function main() {
 
   const team = [
     {
-      nameHi: "रमेश बोहरा",
+      nameHi: "Ramesh Bohra",
       designation: "संस्थापक",
       description:
         "संस्थान के विजन और मार्गदर्शन में अग्रणी; राजनीतिक शिक्षा व सार्वजनिक सेवा के प्रति प्रतिबद्ध।",
       sortOrder: 1,
       isFounder: true,
+      photoUrl: "/uploads/Person/1.jpg",
     },
     {
-      nameHi: "डॉ. अरुण चौधरी",
+      nameHi: "Dr. Arun Choudhary",
       designation: "विशेषज्ञ सलाहकार / शिक्षण बोर्ड",
       description:
         "शैक्षणिक अनुभव के साथ पाठ्यक्रम डिज़ाइन और अनुसंधान दिशा में सहयोग।",
       sortOrder: 2,
       isFounder: false,
+      photoUrl: "/uploads/Person/2.jpg",
     },
     {
-      nameHi: "शिव कुमार शर्मा",
+      nameHi: "Shiv Kumar Sharma",
       designation: "कार्यक्रम प्रमुख",
       description:
         "प्रशिक्षण सत्र, मैदानी गतिविधियों और प्रतिभागी विकास का समन्वय।",
       sortOrder: 3,
       isFounder: false,
+      photoUrl: "/uploads/Person/3.jpg",
     },
     {
-      nameHi: "लोकेश कुमार शर्मा",
+      nameHi: "Lokesh Kumar Sharma",
       designation: "संचालन एवं बाहरी समन्वय",
       description:
         "संस्थागत संचालन, साझेदारी और सामुदायिक जुड़ाव में सक्रिय भूमिका।",
       sortOrder: 4,
       isFounder: false,
-    },
-    {
-      nameHi: "अन्य सदस्य",
-      designation: "कोर टीम",
-      description:
-        "शिक्षण, प्रशासन और क्षेत्रीय आउटरीच में योगदान देने वाले समर्पित सदस्य।",
-      sortOrder: 5,
-      isFounder: false,
+      photoUrl: "/uploads/Person/4.jpg",
     },
   ];
 
-  const teamCount = await prisma.teamMember.count();
-  if (teamCount === 0) {
-    for (const m of team) {
-      await prisma.teamMember.create({
-        data: {
-          ...m,
-          photoUrl: null,
-          published: true,
-        },
+  for (const m of team) {
+    const existing = await prisma.teamMember.findFirst({
+      where: { sortOrder: m.sortOrder },
+    });
+    if (existing) {
+      await prisma.teamMember.update({
+        where: { id: existing.id },
+        data: { ...m, published: true },
       });
+      continue;
     }
+    await prisma.teamMember.create({
+      data: {
+        ...m,
+        published: true,
+      },
+    });
   }
 
   await prisma.blogPost.upsert({
