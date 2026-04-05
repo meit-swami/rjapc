@@ -10,21 +10,21 @@ type Language = "hi" | "en";
 type NavItem = { href: string; labelHi: string; labelEn: string };
 
 const mainNav: NavItem[] = [
-  { href: "#about", labelHi: "परिचय", labelEn: "About" },
-  { href: "#mission", labelHi: "मिशन", labelEn: "Mission" },
-  { href: "#programs", labelHi: "कार्यक्रम", labelEn: "Programs" },
-  { href: "#contact", labelHi: "संपर्क", labelEn: "Contact" },
+  { href: "/#about", labelHi: "परिचय", labelEn: "About" },
+  { href: "/#mission", labelHi: "मिशन", labelEn: "Mission" },
+  { href: "/#programs", labelHi: "कार्यक्रम", labelEn: "Programs" },
+  { href: "/#contact", labelHi: "संपर्क", labelEn: "Contact" },
   { href: "/blog", labelHi: "ब्लॉग", labelEn: "Blog" },
 ];
 
 const knowMoreNav: NavItem[] = [
-  { href: "#curriculum", labelHi: "पाठ्यक्रम", labelEn: "Curriculum" },
-  { href: "#activities", labelHi: "गतिविधियाँ", labelEn: "Activities" },
-  { href: "#team", labelHi: "नेतृत्व", labelEn: "Leadership" },
-  { href: "#why", labelHi: "क्यों हम", labelEn: "Why us" },
-  { href: "#affiliations", labelHi: "सहयोगी", labelEn: "Partners" },
-  { href: "#newsletter", labelHi: "न्यूज़लेटर", labelEn: "Newsletter" },
-  { href: "#media", labelHi: "मीडिया", labelEn: "Media" },
+  { href: "/curriculum", labelHi: "पाठ्यक्रम", labelEn: "Curriculum" },
+  { href: "/activities", labelHi: "गतिविधियाँ", labelEn: "Activities" },
+  { href: "/team", labelHi: "नेतृत्व", labelEn: "Leadership" },
+  { href: "/why", labelHi: "क्यों हम", labelEn: "Why us" },
+  { href: "/affiliations", labelHi: "सहयोगी", labelEn: "Partners" },
+  { href: "/newsletter", labelHi: "न्यूज़लेटर", labelEn: "Newsletter" },
+  { href: "/media", labelHi: "मीडिया", labelEn: "Media" },
 ];
 
 function label(item: NavItem, lang: Language) {

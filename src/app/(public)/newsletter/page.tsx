@@ -14,6 +14,10 @@ export const metadata: Metadata = {
 export default async function NewsletterPage() {
   const data = await getPublicPageData();
   return (
-    <NewsletterSection title={data.newsletterTitle} subtitle={data.newsletter.subtitle} />
+    <NewsletterSection
+      title={data.newsletterTitle}
+      subtitle={data.newsletter.subtitle}
+      attachments={data.newsletterAttachments}
+    />
   );
 }

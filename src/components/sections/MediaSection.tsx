@@ -1,7 +1,11 @@
+"use client";
+
 import Image from "next/image";
+import { useMemo, useState } from "react";
 import type { MediaItem } from "@/lib/content-types";
 import { SectionTitle } from "@/components/SectionTitle";
 import { Reveal } from "@/components/Reveal";
+import { MediaLightbox } from "@/components/MediaLightbox";
 
 function youtubeEmbedSrc(raw: string): string | null {
   try {
@@ -23,6 +27,11 @@ function youtubeEmbedSrc(raw: string): string | null {
     /* ignore */
   }
   return null;
+}
+
+function isUploadedVideoFile(url: string): boolean {
+  if (!url.startsWith("/uploads/")) return false;
+  return /\.(mp4|webm|ogv)$/i.test(url);
 }
 
 function parseItemDate(d: string | null | undefined): { y: number; m: number } | null {
@@ -63,7 +72,6 @@ function buildTimeline(items: MediaItem[]): { dated: Grouped[]; undated: MediaIt
     const [ya, ma] = a.split("-").map(Number);
     const [yb, mb] = b.split("-").map(Number);
     if (ya !== yb) return yb - ya;
-    /* Descending calendar order within year (later month first). */
     return mb - ma;
   });
 
@@ -87,8 +95,33 @@ function buildTimeline(items: MediaItem[]): { dated: Grouped[]; undated: MediaIt
   return { dated, undated };
 }
 
-function MediaCard({ item }: { item: MediaItem }) {
+function MediaCard({
+  item,
+  photoIndex,
+  onPhotoOpen,
+}: {
+  item: MediaItem;
+  photoIndex?: number;
+  onPhotoOpen?: (idx: number) => void;
+}) {
   if (item.kind === "video") {
+    if (isUploadedVideoFile(item.url)) {
+      return (
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-black shadow-md">
+          <video
+            className="aspect-video w-full bg-black"
+            controls
+            preload="metadata"
+            src={item.url}
+            aria-label={item.title}
+          />
+          <p className="border-t border-white/10 px-3 py-2 text-sm font-semibold text-white font-devanagari">
+            {item.title}
+          </p>
+        </div>
+      );
+    }
+
     const embed = youtubeEmbedSrc(item.url);
     return (
       <div className="overflow-hidden rounded-2xl border border-slate-200 bg-black shadow-md">
@@ -116,13 +149,25 @@ function MediaCard({ item }: { item: MediaItem }) {
     );
   }
 
+  const open = () => {
+    if (photoIndex !== undefined) onPhotoOpen?.(photoIndex);
+  };
+
   return (
-    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 shadow-md">
+    <button
+      type="button"
+      className="block w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 text-left shadow-md outline-none ring-saffron/40 transition hover:border-saffron/40 hover:shadow-lg focus-visible:ring-2"
+      onClick={open}
+      aria-label={`Open ${item.title} in viewer`}
+    >
       <div className="relative aspect-[4/3] w-full bg-slate-200">
         <Image src={item.url} alt={item.title} fill className="object-cover" sizes="(max-width:768px) 100vw, 33vw" />
+        <span className="pointer-events-none absolute bottom-2 right-2 rounded-md bg-black/55 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
+          बड़ा देखें
+        </span>
       </div>
       <p className="px-3 py-2 text-sm font-semibold text-navy font-devanagari">{item.title}</p>
-    </div>
+    </button>
   );
 }
 
@@ -133,10 +178,25 @@ export function MediaSection({
 }: {
   title: string;
   items: MediaItem[];
-  /** When true, render the section shell even if there are no items (standalone page). */
   showWhenEmpty?: boolean;
 }) {
-  const valid = items.filter((it) => it.url?.trim());
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+
+  const valid = useMemo(() => items.filter((it) => it.url?.trim()), [items]);
+  const photoList = useMemo(() => valid.filter((i) => i.kind === "photo"), [valid]);
+  const photoIndexByUrl = useMemo(() => {
+    const m = new Map<string, number>();
+    photoList.forEach((p, i) => {
+      if (!m.has(p.url)) m.set(p.url, i);
+    });
+    return m;
+  }, [photoList]);
+
+  const lightboxPhotos = useMemo(
+    () => photoList.map((p) => ({ url: p.url, title: p.title })),
+    [photoList]
+  );
+
   if (!valid.length && !showWhenEmpty) return null;
 
   if (!valid.length) {
@@ -146,7 +206,7 @@ export function MediaSection({
           <SectionTitle
             eyebrow="फ़ोटो व वीडियो"
             title={title}
-            subtitle="समय के अनुसार — वर्ष व माह"
+            subtitle="फ़ाइलें: public/uploads/Media (वर्ष/माह फ़ोल्डर) तथा CMS"
           />
           <p className="mt-10 text-center text-slate-500 font-devanagari">
             अभी प्रदर्शित करने के लिए कोई फ़ोटो या वीडियो नहीं है।
@@ -164,7 +224,7 @@ export function MediaSection({
         <SectionTitle
           eyebrow="फ़ोटो व वीडियो"
           title={title}
-          subtitle="समय के अनुसार — वर्ष व माह"
+          subtitle="फ़ोटो पर क्लिक — पूर्ण स्क्रीन, नेविगेट व ज़ूम"
         />
 
         <div className="relative">
@@ -189,7 +249,11 @@ export function MediaSection({
                       <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                         {monthItems.map((it, i) => (
                           <Reveal key={`${it.url}-${i}`} delay={i * 70}>
-                            <MediaCard item={it} />
+                            <MediaCard
+                              item={it}
+                              photoIndex={it.kind === "photo" ? photoIndexByUrl.get(it.url) : undefined}
+                              onPhotoOpen={setLightboxIndex}
+                            />
                           </Reveal>
                         ))}
                       </div>
@@ -210,7 +274,11 @@ export function MediaSection({
                 <div className="mt-4 grid gap-6 pl-10 sm:grid-cols-2 lg:grid-cols-3 md:pl-14">
                   {undated.map((it, i) => (
                     <Reveal key={`undated-${it.url}-${i}`} delay={i * 70}>
-                      <MediaCard item={it} />
+                      <MediaCard
+                        item={it}
+                        photoIndex={it.kind === "photo" ? photoIndexByUrl.get(it.url) : undefined}
+                        onPhotoOpen={setLightboxIndex}
+                      />
                     </Reveal>
                   ))}
                 </div>
@@ -219,6 +287,15 @@ export function MediaSection({
           </div>
         </div>
       </div>
+
+      {lightboxIndex !== null && lightboxPhotos.length > 0 ? (
+        <MediaLightbox
+          photos={lightboxPhotos}
+          index={lightboxIndex}
+          onClose={() => setLightboxIndex(null)}
+          onIndexChange={setLightboxIndex}
+        />
+      ) : null}
     </section>
   );
 }

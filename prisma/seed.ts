@@ -97,8 +97,22 @@ async function main() {
       key: "contact",
       title: "संपर्क",
       body: JSON.stringify({
-        phones: ["+91-XXXXXXXXXX", "+91-YYYYYYYYYY"],
-        addressLine: "192/96, सेक्टर-19, प्रताप नगर, जयपुर",
+        phones: [
+          "Sansthapak: +91-8302141401",
+          "Lokesh: +91-6350687073",
+          "Office: 0141-3286277",
+        ],
+        addressBlocks: [
+          {
+            label: "Panjikrit karyala",
+            line: "192/96, सेक्टर-19, प्रताप नगर, जयपुर",
+          },
+          {
+            label: "Office पता",
+            line:
+              "193/2/01 Keshav Market, Janki Devi Road, Sector 1, Pratap Nagar, Jaipur, 302033",
+          },
+        ],
       }),
     },
     {

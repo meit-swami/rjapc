@@ -20,9 +20,17 @@ export type CurriculumBody = {
   subjects: string[];
 };
 
+export type ContactAddressBlock = {
+  label: string;
+  line: string;
+};
+
 export type ContactBody = {
   phones: string[];
-  addressLine: string;
+  /** Legacy single address; used if addressBlocks is empty */
+  addressLine?: string;
+  /** Two (or more) labelled addresses, e.g. पंजीकृत कार्यालय + Office */
+  addressBlocks?: ContactAddressBlock[];
 };
 
 export type AffiliationItem = {

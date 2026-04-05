@@ -1,12 +1,15 @@
 import { SectionTitle } from "@/components/SectionTitle";
 import { ContactForm } from "@/components/ContactForm";
 import { Reveal } from "@/components/Reveal";
+import { SocialLinks } from "@/components/SocialLinks";
+import { phoneLineToTelHref } from "@/lib/contact-display";
+import type { ContactAddressBlock } from "@/lib/content-types";
 
 export function ContactSection({
-  addressLine,
+  addressBlocks,
   phones,
 }: {
-  addressLine: string;
+  addressBlocks: ContactAddressBlock[];
   phones: string[];
 }) {
   return (
@@ -17,17 +20,29 @@ export function ContactSection({
           <Reveal>
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-lg md:p-8">
               <h3 className="text-lg font-bold text-navy font-devanagari">पता</h3>
-              <p className="mt-2 text-slate-700 font-devanagari leading-relaxed">{addressLine}</p>
+              <div className="mt-3 space-y-5 text-slate-700">
+                {addressBlocks.length ? (
+                  addressBlocks.map((b) => (
+                    <div key={`${b.label}-${b.line.slice(0, 24)}`}>
+                      <p className="text-sm font-semibold text-navy font-devanagari">{b.label}</p>
+                      <p className="mt-1 leading-relaxed font-devanagari">{b.line}</p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="leading-relaxed font-devanagari text-slate-500">पता जल्द अपडेट किया जाएगा।</p>
+                )}
+              </div>
               <h3 className="mt-8 text-lg font-bold text-navy font-devanagari">फ़ोन</h3>
-              <ul className="mt-2 space-y-1 text-slate-700">
+              <ul className="mt-2 space-y-2 text-slate-700">
                 {phones.map((p) => (
                   <li key={p}>
-                    <a href={`tel:${p.replace(/\s/g, "")}`} className="hover:text-saffron">
+                    <a href={phoneLineToTelHref(p)} className="hover:text-saffron font-devanagari">
                       {p}
                     </a>
                   </li>
                 ))}
               </ul>
+              <SocialLinks className="mt-8" />
             </div>
           </Reveal>
           <Reveal delay={120}>

@@ -28,6 +28,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function HomePage() {
   const data = await getPublicPageData();
   const base = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const schemaPostal = data.contact.streetAddressForSchema.match(/\b(\d{6})\b/)?.[1];
   const orgJson = {
     "@context": "https://schema.org",
     "@type": "EducationalOrganization",
@@ -36,8 +37,10 @@ export default async function HomePage() {
     url: base,
     address: {
       "@type": "PostalAddress",
-      streetAddress: data.contact.addressLine,
-      addressLocality: "जयपुर",
+      streetAddress: data.contact.streetAddressForSchema || undefined,
+      ...(schemaPostal ? { postalCode: schemaPostal } : {}),
+      addressLocality: "Jaipur",
+      addressRegion: "Rajasthan",
       addressCountry: "IN",
     },
   };
@@ -53,7 +56,7 @@ export default async function HomePage() {
       <ActivitiesSection items={data.activities.items} />
       <TeamSection team={data.team} />
       <WhyJoinSection items={data.whyJoin.items} />
-      <ContactSection addressLine={data.contact.addressLine} phones={data.contact.phones} />
+      <ContactSection addressBlocks={data.contact.addressBlocks} phones={data.contact.phones} />
     </>
   );
 }

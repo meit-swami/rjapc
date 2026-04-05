@@ -11,7 +11,7 @@ const KEYS_HELP: Record<string, string> = {
   curriculum: '{"subjects":[]}',
   activities: '{"items":[]}',
   why_join: '{"items":[]}',
-  contact: '{"phones":[],"addressLine":""}',
+  contact: '{"phones":[],"addressBlocks":[{"label":"","line":""}],"addressLine":""}',
   seo: '{"title":"","description":""}',
   affiliations: '{"items":[{"name":"","logoUrl":null,"href":null}]}',
   newsletter: '{"subtitle":""}',
