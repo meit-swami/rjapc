@@ -1,17 +1,17 @@
 import type { Metadata } from "next";
 import { getPublicPageData } from "@/lib/public-data";
-import { TeamSection } from "@/components/sections/TeamSection";
+import { CoreTeamMembersPage } from "@/components/sections/CoreTeamMembersPage";
 
 export const metadata: Metadata = {
-  title: "नेतृत्व",
-  description: "अनुभव, प्रतिबद्धता व मार्गदर्शन — नेतृत्व टीम।",
+  title: "Core Team Members | कोर टीम सदस्य",
+  description: "Full directory of core team members — अनुभव, प्रतिबद्धता व मार्गदर्शन।",
   openGraph: {
-    title: "नेतृत्व",
-    description: "अनुभव, प्रतिबद्धता व मार्गदर्शन — नेतृत्व टीम।",
+    title: "Core Team Members | कोर टीम सदस्य",
+    description: "Full directory of core team members — अनुभव, प्रतिबद्धता व मार्गदर्शन।",
   },
 };
 
 export default async function TeamPage() {
   const data = await getPublicPageData();
-  return <TeamSection team={data.team} />;
+  return <CoreTeamMembersPage team={data.team} />;
 }

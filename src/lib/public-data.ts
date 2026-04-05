@@ -21,6 +21,22 @@ import {
   scanMediaFolder,
   scanNewsletterFolder,
 } from "@/lib/public-uploads";
+import {
+  contactPhonesLookLikePlaceholders,
+  DEFAULT_CONTACT_BODY,
+} from "@/lib/contact-defaults";
+
+/** Replace legacy seed / placeholder contact JSON with current addresses & numbers. */
+function upgradeLegacyContactBody(raw: ContactBody): ContactBody {
+  const phones = Array.isArray(raw.phones) ? raw.phones : [];
+  const hasBlocks =
+    Array.isArray(raw.addressBlocks) && raw.addressBlocks.some((b) => b?.line && String(b.line).trim());
+
+  if (contactPhonesLookLikePlaceholders(phones) && !hasBlocks) {
+    return { ...DEFAULT_CONTACT_BODY };
+  }
+  return raw;
+}
 
 function normalizePublicContact(raw: ContactBody): {
   phones: string[];
@@ -117,10 +133,12 @@ export const getPublicPageData = cache(async function getPublicPageData() {
     activities: parseJson<ListBody>(activities?.body ?? "{}", { items: [] }),
     whyJoin: parseJson<ListBody>(whyJoin?.body ?? "{}", { items: [] }),
     contact: normalizePublicContact(
-      parseJson<ContactBody>(contact?.body ?? "{}", {
-        phones: [],
-        addressBlocks: [],
-      })
+      upgradeLegacyContactBody(
+        parseJson<ContactBody>(contact?.body ?? "{}", {
+          phones: [],
+          addressBlocks: [],
+        })
+      )
     ),
     seo: parseJson<{ title?: string; description?: string }>(seo?.body ?? "{}", {}),
     affiliationsTitle: affiliationsSec?.title ?? "सहयोगी संस्थाएँ",

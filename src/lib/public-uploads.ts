@@ -8,7 +8,9 @@ const UPLOADS = path.join(PUBLIC, "uploads");
 export type NewsletterUpload = {
   name: string;
   href: string;
-  kind: "pdf" | "image";
+  kind: "pdf" | "image" | "video";
+  /** Original filename on disk (for stable natural sort). */
+  fileName: string;
 };
 
 const IMG_EXT = /\.(jpe?g|png|webp|gif|svg)$/i;
@@ -162,7 +164,7 @@ export async function scanMediaFolder(): Promise<MediaItem[]> {
   return dedupeByUrl(out);
 }
 
-/** PDFs and images in public/uploads/Newsletter */
+/** PDFs, images, and videos in public/uploads/Newsletter */
 export async function scanNewsletterFolder(): Promise<NewsletterUpload[]> {
   const dir = path.join(UPLOADS, "Newsletter");
   if (!(await pathExists(dir))) return [];
@@ -177,13 +179,18 @@ export async function scanNewsletterFolder(): Promise<NewsletterUpload[]> {
     if (!ent.isFile()) continue;
     const full = path.join(dir, ent.name);
     const href = toPublicUrl(full);
+    const base = { name: humanizeStem(ent.name), href, fileName: ent.name };
     if (PDF_EXT.test(ent.name)) {
-      out.push({ name: humanizeStem(ent.name), href, kind: "pdf" });
+      out.push({ ...base, kind: "pdf" });
     } else if (IMG_EXT.test(ent.name)) {
-      out.push({ name: humanizeStem(ent.name), href, kind: "image" });
+      out.push({ ...base, kind: "image" });
+    } else if (VID_EXT.test(ent.name)) {
+      out.push({ ...base, kind: "video" });
     }
   }
-  out.sort((a, b) => a.name.localeCompare(b.name, "hi"));
+  out.sort((a, b) =>
+    a.fileName.localeCompare(b.fileName, undefined, { numeric: true, sensitivity: "base" }),
+  );
   return out;
 }
 

@@ -8,6 +8,7 @@ import { CurriculumSection } from "@/components/sections/CurriculumSection";
 import { ActivitiesSection } from "@/components/sections/ActivitiesSection";
 import { TeamSection } from "@/components/sections/TeamSection";
 import { WhyJoinSection } from "@/components/sections/WhyJoinSection";
+import { DonationsSection } from "@/components/sections/DonationsSection";
 import { ContactSection } from "@/components/sections/ContactSection";
 import { JsonLd } from "@/components/JsonLd";
 
@@ -56,6 +57,7 @@ export default async function HomePage() {
       <ActivitiesSection items={data.activities.items} />
       <TeamSection team={data.team} />
       <WhyJoinSection items={data.whyJoin.items} />
+      <DonationsSection />
       <ContactSection addressBlocks={data.contact.addressBlocks} phones={data.contact.phones} />
     </>
   );
