@@ -13,6 +13,9 @@ const KEYS_HELP: Record<string, string> = {
   why_join: '{"items":[]}',
   contact: '{"phones":[],"addressLine":""}',
   seo: '{"title":"","description":""}',
+  affiliations: '{"items":[{"name":"","logoUrl":null,"href":null}]}',
+  newsletter: '{"subtitle":""}',
+  media: '{"items":[{"kind":"photo","title":"","url":"","date":"2024-01-15"}]}',
 };
 
 export function ContentAdmin() {

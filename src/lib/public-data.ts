@@ -1,13 +1,17 @@
 import { prisma } from "@/lib/prisma";
 import type {
   AboutBody,
+  AffiliationsBody,
   ContactBody,
   CurriculumBody,
   HeroBody,
   ListBody,
+  MediaBody,
   MissionBody,
+  NewsletterBlockBody,
 } from "@/lib/content-types";
 import { parseJson } from "@/lib/content-types";
+import { filterPublicTeamMembers } from "@/lib/team-filter";
 
 export async function getPublicPageData() {
   const sections = await prisma.contentSection.findMany();
@@ -21,6 +25,9 @@ export async function getPublicPageData() {
   const whyJoin = map.why_join;
   const contact = map.contact;
   const seo = map.seo;
+  const affiliationsSec = map.affiliations;
+  const newsletterSec = map.newsletter;
+  const mediaSec = map.media;
 
   const courses = await prisma.course.findMany({
     where: { published: true },
@@ -67,6 +74,12 @@ export async function getPublicPageData() {
       addressLine: "",
     }),
     seo: parseJson<{ title?: string; description?: string }>(seo?.body ?? "{}", {}),
+    affiliationsTitle: affiliationsSec?.title ?? "सहयोगी संस्थाएँ",
+    affiliations: parseJson<AffiliationsBody>(affiliationsSec?.body ?? "{}", { items: [] }),
+    newsletterTitle: newsletterSec?.title ?? "न्यूज़लेटर",
+    newsletter: parseJson<NewsletterBlockBody>(newsletterSec?.body ?? "{}", {}),
+    mediaTitle: mediaSec?.title ?? "Media",
+    media: parseJson<MediaBody>(mediaSec?.body ?? "{}", { items: [] }),
     courses: courses.map((c) => ({
       id: c.id,
       slug: c.slug,
@@ -76,7 +89,7 @@ export async function getPublicPageData() {
       topics: safeStringArray(c.topics),
       activities: safeStringArray(c.activities),
     })),
-    team: team.map((m) => ({
+    team: filterPublicTeamMembers(team).map((m) => ({
       id: m.id,
       nameHi: m.nameHi,
       designation: m.designation,

@@ -15,6 +15,9 @@ const links: Array<{ href: string; label: string }> = [
   { href: "#activities", label: "गतिविधियाँ" },
   { href: "#team", label: "नेतृत्व" },
   { href: "#why", label: "क्यों हम" },
+  { href: "#affiliations", label: "सहयोगी" },
+  { href: "#newsletter", label: "न्यूज़लेटर" },
+  { href: "#media", label: "Media" },
   { href: "#contact", label: "संपर्क" },
   { href: "/blog", label: "ब्लॉग" },
 ];

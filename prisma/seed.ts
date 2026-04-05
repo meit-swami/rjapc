@@ -110,6 +110,49 @@ async function main() {
           "राष्ट्रीय जनादेश प्रमोशनल काउंसिल — राजनीतिक शिक्षा, नेतृत्व विकास और लोकतांत्रिक जागरूकता हेतु उच्च शिक्षण संस्थान, जयपुर।",
       }),
     },
+    {
+      key: "affiliations",
+      title: "सहयोगी संस्थाएँ",
+      body: JSON.stringify({
+        items: [
+          { name: "उदाहरण संस्था", logoUrl: null as string | null, href: null as string | null },
+          { name: "साझेदार नेटवर्क", logoUrl: null, href: "https://example.org" },
+        ],
+      }),
+    },
+    {
+      key: "newsletter",
+      title: "न्यूज़लेटर",
+      body: JSON.stringify({
+        subtitle: "कार्यक्रम अपडेट व लेख सीधे आपके इनबॉक्स में।",
+      }),
+    },
+    {
+      key: "media",
+      title: "Media",
+      body: JSON.stringify({
+        items: [
+          {
+            kind: "photo" as const,
+            title: "कार्यक्रम — उदाहरण फ़ोटो",
+            url: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=1200&q=80",
+            date: "2024-03-15",
+          },
+          {
+            kind: "video" as const,
+            title: "लोकतंत्र पर चर्चा (उदाहरण)",
+            url: "https://www.youtube.com/watch?v=YE7VzlLtp-4",
+            date: "2024-03-20",
+          },
+          {
+            kind: "photo" as const,
+            title: "शैक्षिक सत्र",
+            url: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=1200&q=80",
+            date: "2023-11-08",
+          },
+        ],
+      }),
+    },
   ];
 
   for (const s of sections) {

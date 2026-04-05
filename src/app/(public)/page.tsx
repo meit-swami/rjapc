@@ -10,6 +10,9 @@ import { TeamSection } from "@/components/sections/TeamSection";
 import { WhyJoinSection } from "@/components/sections/WhyJoinSection";
 import { ContactSection } from "@/components/sections/ContactSection";
 import { BlogTeaser } from "@/components/sections/BlogTeaser";
+import { AffiliationsSection } from "@/components/sections/AffiliationsSection";
+import { NewsletterSection } from "@/components/sections/NewsletterSection";
+import { MediaSection } from "@/components/sections/MediaSection";
 import { JsonLd } from "@/components/JsonLd";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -54,6 +57,9 @@ export default async function HomePage() {
       <ActivitiesSection items={data.activities.items} />
       <TeamSection team={data.team} />
       <WhyJoinSection items={data.whyJoin.items} />
+      <AffiliationsSection title={data.affiliationsTitle} items={data.affiliations.items} />
+      <NewsletterSection title={data.newsletterTitle} subtitle={data.newsletter.subtitle} />
+      <MediaSection title={data.mediaTitle} items={data.media.items} />
       <BlogTeaser
         posts={data.blogPosts.map((p) => ({
           slug: p.slug,

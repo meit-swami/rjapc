@@ -1,6 +1,5 @@
 import { SectionTitle } from "@/components/SectionTitle";
 import { ContactForm } from "@/components/ContactForm";
-import { NewsletterForm } from "@/components/NewsletterForm";
 import { Reveal } from "@/components/Reveal";
 
 export function ContactSection({
@@ -35,15 +34,12 @@ export function ContactSection({
             <ContactForm />
           </Reveal>
         </div>
-        <div className="mt-12 rounded-2xl bg-navy p-6 text-white md:p-8">
-          <h3 className="text-lg font-bold font-devanagari">न्यूज़लेटर</h3>
-          <p className="mt-1 text-sm text-white/75 font-devanagari">
-            कार्यक्रम अपडेट व लेख सीधे आपके इनबॉक्स में।
-          </p>
-          <div className="mt-4">
-            <NewsletterForm />
-          </div>
-        </div>
+        <p className="mt-10 text-center text-sm text-slate-600 font-devanagari">
+          <a href="#newsletter" className="font-semibold text-saffron hover:underline">
+            न्यूज़लेटर सदस्यता
+          </a>{" "}
+          — कार्यक्रम अपडेट ईमेल पर पाएँ।
+        </p>
       </div>
     </section>
   );
