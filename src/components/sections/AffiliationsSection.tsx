@@ -7,12 +7,27 @@ import { Reveal } from "@/components/Reveal";
 export function AffiliationsSection({
   title,
   items,
+  showWhenEmpty = false,
 }: {
   title: string;
   items: AffiliationItem[];
+  showWhenEmpty?: boolean;
 }) {
   const list = items.filter((a) => a.name?.trim());
-  if (!list.length) return null;
+  if (!list.length && !showWhenEmpty) return null;
+
+  if (!list.length) {
+    return (
+      <section id="affiliations" className="scroll-mt-24 bg-white py-16 md:py-20">
+        <div className="mx-auto max-w-6xl px-4 md:px-6">
+          <SectionTitle eyebrow="साझेदारी" title={title} subtitle="संस्थागत सहयोग व मान्यता" />
+          <p className="mt-10 text-center text-slate-500 font-devanagari">
+            सहयोगी संस्थाओं की सूची शीघ्र अपडेट की जाएगी।
+          </p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="affiliations" className="scroll-mt-24 bg-white py-16 md:py-20">

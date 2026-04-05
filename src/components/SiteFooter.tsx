@@ -12,6 +12,15 @@ export function SiteFooter() {
           <Link href="/blog" className="hover:text-saffron font-devanagari">
             ब्लॉग
           </Link>
+          <Link href="/affiliations" className="hover:text-saffron font-devanagari">
+            सहयोगी
+          </Link>
+          <Link href="/newsletter" className="hover:text-saffron font-devanagari">
+            न्यूज़लेटर
+          </Link>
+          <Link href="/media" className="hover:text-saffron font-devanagari">
+            मीडिया
+          </Link>
           <Link href="/admin/login" className="hover:text-saffron">
             प्रशासन
           </Link>

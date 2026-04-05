@@ -35,7 +35,7 @@ export function ContactSection({
           </Reveal>
         </div>
         <p className="mt-10 text-center text-sm text-slate-600 font-devanagari">
-          <a href="#newsletter" className="font-semibold text-saffron hover:underline">
+          <a href="/newsletter" className="font-semibold text-saffron hover:underline">
             न्यूज़लेटर सदस्यता
           </a>{" "}
           — कार्यक्रम अपडेट ईमेल पर पाएँ।

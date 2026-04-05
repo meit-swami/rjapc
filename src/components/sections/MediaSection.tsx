@@ -126,9 +126,35 @@ function MediaCard({ item }: { item: MediaItem }) {
   );
 }
 
-export function MediaSection({ title, items }: { title: string; items: MediaItem[] }) {
+export function MediaSection({
+  title,
+  items,
+  showWhenEmpty = false,
+}: {
+  title: string;
+  items: MediaItem[];
+  /** When true, render the section shell even if there are no items (standalone page). */
+  showWhenEmpty?: boolean;
+}) {
   const valid = items.filter((it) => it.url?.trim());
-  if (!valid.length) return null;
+  if (!valid.length && !showWhenEmpty) return null;
+
+  if (!valid.length) {
+    return (
+      <section id="media" className="scroll-mt-24 bg-white py-16 md:py-24">
+        <div className="mx-auto max-w-6xl px-4 md:px-6">
+          <SectionTitle
+            eyebrow="फ़ोटो व वीडियो"
+            title={title}
+            subtitle="समय के अनुसार — वर्ष व माह"
+          />
+          <p className="mt-10 text-center text-slate-500 font-devanagari">
+            अभी प्रदर्शित करने के लिए कोई फ़ोटो या वीडियो नहीं है।
+          </p>
+        </div>
+      </section>
+    );
+  }
 
   const { dated, undated } = buildTimeline(valid);
 

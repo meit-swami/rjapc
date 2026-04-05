@@ -88,14 +88,29 @@ body {
   }
 }
 
-/* Hide default Google Translate UI while keeping translation behavior. */
+/*
+ * Hide Google Translate chrome only — do NOT set display:none on .goog-te-gadget,
+ * or the widget may not apply page translation reliably.
+ */
 .goog-te-banner-frame.skiptranslate,
-.goog-te-gadget,
 .goog-te-spinner-pos,
 .goog-logo-link,
 #goog-gt-tt {
   display: none !important;
   visibility: hidden !important;
+}
+
+/* Visually hide the gadget (custom EN/HIN toggle); combo must stay in layout tree. */
+#google_translate_element {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
 }
 
 body {

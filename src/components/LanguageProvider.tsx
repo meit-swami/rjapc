@@ -31,6 +31,7 @@ declare global {
           options: Record<string, unknown>,
           elementId: string
         ) => unknown;
+        TranslateElementInlineLayout?: { SIMPLE: number };
       };
     };
   }
@@ -59,20 +60,51 @@ function fireComboChange(combo: HTMLSelectElement) {
   combo.dispatchEvent(new InputEvent("input", { bubbles: true }));
 }
 
+function selectOriginalLanguage(combo: HTMLSelectElement): boolean {
+  const opts = Array.from(combo.options);
+  const emptyIdx = opts.findIndex((o) => o.value === "");
+  if (emptyIdx >= 0) {
+    combo.selectedIndex = emptyIdx;
+    fireComboChange(combo);
+    return true;
+  }
+  if (opts.length > 0) {
+    combo.selectedIndex = 0;
+    fireComboChange(combo);
+    return true;
+  }
+  return false;
+}
+
+function selectEnglishTranslation(combo: HTMLSelectElement): boolean {
+  const candidates = ["en", "en|hi", "hi|en", "/en/en", "/hi/en"];
+  for (const v of candidates) {
+    const idx = Array.from(combo.options).findIndex((o) => o.value === v);
+    if (idx >= 0) {
+      combo.selectedIndex = idx;
+      fireComboChange(combo);
+      return true;
+    }
+  }
+  for (let i = 0; i < combo.options.length; i++) {
+    const o = combo.options[i];
+    const t = (o.textContent || "").toLowerCase();
+    if (t.includes("english") && o.value !== "") {
+      combo.selectedIndex = i;
+      fireComboChange(combo);
+      return true;
+    }
+  }
+  return false;
+}
+
 function tryApplyViaCombo(lang: Language): boolean {
   const combo = document.querySelector(".goog-te-combo") as HTMLSelectElement | null;
-  if (!combo) return false;
+  if (!combo || combo.options.length === 0) return false;
   if (lang === "hi") {
-    combo.value = "";
-    if (combo.value !== "") {
-      const opt = combo.querySelector('option[value=""]');
-      if (opt) combo.selectedIndex = Array.from(combo.options).indexOf(opt as HTMLOptionElement);
-    }
-  } else {
-    combo.value = "en";
+    return selectOriginalLanguage(combo);
   }
-  fireComboChange(combo);
-  return true;
+  return selectEnglishTranslation(combo);
 }
 
 function applyGoogleLanguage(lang: Language, allowReload: boolean) {
@@ -84,17 +116,18 @@ function applyGoogleLanguage(lang: Language, allowReload: boolean) {
     setGoogtransCookies("/hi/en");
   }
 
-  const attempt = () => tryApplyViaCombo(lang);
-
-  if (attempt()) return;
-
-  requestAnimationFrame(() => {
-    if (attempt()) return;
-    window.setTimeout(() => {
-      if (attempt()) return;
+  let tries = 0;
+  const maxTries = 8;
+  const run = () => {
+    if (tryApplyViaCombo(lang)) return;
+    tries += 1;
+    if (tries >= maxTries) {
       if (allowReload) window.location.reload();
-    }, 150);
-  });
+      return;
+    }
+    window.setTimeout(run, 100 * tries);
+  };
+  run();
 }
 
 function getSavedLanguage(): Language {
@@ -107,24 +140,39 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>("hi");
   const [translatorReady, setTranslatorReady] = useState(false);
   const translateMounted = useRef(false);
-  /** True when the next apply is from clicking the header toggle (may hard-reload if the widget combo is missing). */
   const languageChangeFromUser = useRef(false);
+  const bootstrapEnglishDone = useRef(false);
 
   useEffect(() => {
     const saved = getSavedLanguage();
     setLanguageState(saved);
+    if (saved === "en") setGoogtransCookies("/hi/en");
+    else clearGoogtransCookies();
   }, []);
+
+  useEffect(() => {
+    document.documentElement.lang = language === "en" ? "en" : "hi";
+  }, [language]);
 
   useLayoutEffect(() => {
     window.googleTranslateElementInit = () => {
       if (translateMounted.current) return;
       if (!window.google?.translate?.TranslateElement) return;
       translateMounted.current = true;
-      new window.google.translate.TranslateElement(
+
+      const TE = window.google.translate.TranslateElement as unknown as {
+        new (options: Record<string, unknown>, elementId: string): unknown;
+        InlineLayout?: { SIMPLE: number };
+      };
+
+      const layout = TE.InlineLayout?.SIMPLE;
+
+      new TE(
         {
           pageLanguage: "hi",
-          includedLanguages: "hi,en",
+          includedLanguages: "en",
           autoDisplay: false,
+          ...(layout !== undefined ? { layout } : {}),
         },
         "google_translate_element"
       );
@@ -134,9 +182,13 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!translatorReady) return;
-    const allowReload = languageChangeFromUser.current;
+    const userClicked = languageChangeFromUser.current;
     languageChangeFromUser.current = false;
-    applyGoogleLanguage(language, allowReload);
+
+    const firstTimeEnglish = language === "en" && !bootstrapEnglishDone.current;
+    if (language === "en") bootstrapEnglishDone.current = true;
+
+    applyGoogleLanguage(language, userClicked || firstTimeEnglish);
   }, [language, translatorReady]);
 
   const setLanguage = useCallback((lang: Language) => {
@@ -144,6 +196,8 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     setLanguageState(lang);
     if (typeof window !== "undefined") {
       window.localStorage.setItem("site-language", lang);
+      if (lang === "en") setGoogtransCookies("/hi/en");
+      else clearGoogtransCookies();
     }
   }, []);
 
@@ -157,7 +211,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   return (
     <LanguageContext.Provider value={value}>
-      <div id="google_translate_element" className="hidden" />
+      <div id="google_translate_element" />
       <Script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" />
       {children}
     </LanguageContext.Provider>
