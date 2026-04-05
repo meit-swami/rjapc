@@ -1,6 +1,12 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { AFFILIATE_BOOKS_BY_COURSE_SLUG } from "../src/lib/affiliate-books";
 import { DEFAULT_CONTACT_BODY } from "../src/lib/contact-defaults";
+import {
+  DEFAULT_DONATIONS_BODY,
+  DEFAULT_PROGRAMS_SECTION,
+  DEFAULT_SITE_CHROME,
+} from "../src/lib/site-defaults";
 
 const prisma = new PrismaClient();
 
@@ -150,6 +156,26 @@ async function main() {
           },
         ],
       }),
+    },
+    {
+      key: "programs",
+      title: "कार्यक्रम खंड (शीर्षक)",
+      body: JSON.stringify(DEFAULT_PROGRAMS_SECTION),
+    },
+    {
+      key: "donations",
+      title: "दान खंड",
+      body: JSON.stringify(DEFAULT_DONATIONS_BODY),
+    },
+    {
+      key: "affiliate_books",
+      title: "सहबद्ध पुस्तकें (कोर्स स्लग)",
+      body: JSON.stringify(AFFILIATE_BOOKS_BY_COURSE_SLUG),
+    },
+    {
+      key: "site_chrome",
+      title: "हेडर, फ़ुटर, नेविगेशन",
+      body: JSON.stringify(DEFAULT_SITE_CHROME),
     },
   ];
 

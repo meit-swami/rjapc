@@ -11,9 +11,18 @@ import type {
   MediaBody,
   MissionBody,
   NewsletterBlockBody,
+  DonationsBody,
+  ProgramsSectionBody,
+  SiteChromeBody,
 } from "@/lib/content-types";
 import { parseJson } from "@/lib/content-types";
+import { AFFILIATE_BOOKS_BY_COURSE_SLUG, type AffiliateBookLink } from "@/lib/affiliate-books";
 import { filterPublicTeamMembers } from "@/lib/team-filter";
+import {
+  mergeDonationsBody,
+  mergeProgramsSection,
+  mergeSiteChrome,
+} from "@/lib/site-defaults";
 import {
   mergeAffiliations,
   mergeMediaItems,
@@ -24,7 +33,9 @@ import {
 import {
   contactPhonesLookLikePlaceholders,
   DEFAULT_CONTACT_BODY,
+  normalizeContactPhoneLabels,
 } from "@/lib/contact-defaults";
+import { mergePublicSocialUrls } from "@/lib/public-social";
 
 /** Replace legacy seed / placeholder contact JSON with current addresses & numbers. */
 function upgradeLegacyContactBody(raw: ContactBody): ContactBody {
@@ -43,9 +54,9 @@ function normalizePublicContact(raw: ContactBody): {
   addressBlocks: ContactAddressBlock[];
   streetAddressForSchema: string;
 } {
-  const phones = Array.isArray(raw.phones)
-    ? raw.phones.filter((p) => typeof p === "string" && p.trim())
-    : [];
+  const phones = normalizeContactPhoneLabels(
+    Array.isArray(raw.phones) ? raw.phones.filter((p) => typeof p === "string" && p.trim()) : []
+  );
 
   let addressBlocks: ContactAddressBlock[] = [];
   if (Array.isArray(raw.addressBlocks)) {
@@ -70,6 +81,33 @@ function normalizePublicContact(raw: ContactBody): {
   return { phones, addressBlocks, streetAddressForSchema };
 }
 
+function mergeAffiliateBooksFromDb(bodyStr: string): Record<string, AffiliateBookLink[]> {
+  const parsed = parseJson<Record<string, unknown>>(bodyStr, {});
+  const fromDb: Record<string, AffiliateBookLink[]> = {};
+  for (const [slug, v] of Object.entries(parsed)) {
+    if (!Array.isArray(v)) continue;
+    const list: AffiliateBookLink[] = [];
+    for (const item of v) {
+      if (!item || typeof item !== "object") continue;
+      const href = (item as { href?: unknown }).href;
+      if (typeof href !== "string" || !href.trim()) continue;
+      list.push(item as AffiliateBookLink);
+    }
+    fromDb[slug] = list;
+  }
+  const slugs = new Set([
+    ...Object.keys(AFFILIATE_BOOKS_BY_COURSE_SLUG),
+    ...Object.keys(fromDb),
+  ]);
+  const out: Record<string, AffiliateBookLink[]> = {};
+  for (const slug of slugs) {
+    out[slug] = Object.prototype.hasOwnProperty.call(fromDb, slug)
+      ? fromDb[slug]!
+      : (AFFILIATE_BOOKS_BY_COURSE_SLUG[slug] ?? []);
+  }
+  return out;
+}
+
 export const getPublicPageData = cache(async function getPublicPageData() {
   const sections = await prisma.contentSection.findMany();
   const map = Object.fromEntries(sections.map((s) => [s.key, s]));
@@ -85,6 +123,10 @@ export const getPublicPageData = cache(async function getPublicPageData() {
   const affiliationsSec = map.affiliations;
   const newsletterSec = map.newsletter;
   const mediaSec = map.media;
+  const programsSec = map.programs;
+  const donationsSec = map.donations;
+  const siteChromeSec = map.site_chrome;
+  const affiliateBooksSec = map.affiliate_books;
 
   const courses = await prisma.course.findMany({
     where: { published: true },
@@ -132,14 +174,18 @@ export const getPublicPageData = cache(async function getPublicPageData() {
     curriculum: parseJson<CurriculumBody>(curriculum?.body ?? "{}", { subjects: [] }),
     activities: parseJson<ListBody>(activities?.body ?? "{}", { items: [] }),
     whyJoin: parseJson<ListBody>(whyJoin?.body ?? "{}", { items: [] }),
-    contact: normalizePublicContact(
-      upgradeLegacyContactBody(
+    contact: (() => {
+      const contactBody = upgradeLegacyContactBody(
         parseJson<ContactBody>(contact?.body ?? "{}", {
           phones: [],
           addressBlocks: [],
         })
-      )
-    ),
+      );
+      return {
+        ...normalizePublicContact(contactBody),
+        socialUrls: mergePublicSocialUrls(contactBody),
+      };
+    })(),
     seo: parseJson<{ title?: string; description?: string }>(seo?.body ?? "{}", {}),
     affiliationsTitle: affiliationsSec?.title ?? "सहयोगी संस्थाएँ",
     affiliations: {
@@ -176,6 +222,12 @@ export const getPublicPageData = cache(async function getPublicPageData() {
       isFounder: m.isFounder,
     })),
     blogPosts: posts,
+    programsSection: mergeProgramsSection(
+      parseJson<Partial<ProgramsSectionBody>>(programsSec?.body ?? "{}", {})
+    ),
+    donations: mergeDonationsBody(parseJson<Partial<DonationsBody>>(donationsSec?.body ?? "{}", {})),
+    siteChrome: mergeSiteChrome(parseJson<Partial<SiteChromeBody>>(siteChromeSec?.body ?? "{}", {})),
+    affiliateBooksBySlug: mergeAffiliateBooksFromDb(affiliateBooksSec?.body ?? "{}"),
   };
 });
 

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SectionTitle } from "@/components/SectionTitle";
 import { Reveal } from "@/components/Reveal";
+import type { ProgramsSectionBody } from "@/lib/content-types";
 
 export type CourseCard = {
   id: string;
@@ -12,15 +13,17 @@ export type CourseCard = {
   activities: string[];
 };
 
-export function ProgramsSection({ courses }: { courses: CourseCard[] }) {
+export function ProgramsSection({
+  courses,
+  heading,
+}: {
+  courses: CourseCard[];
+  heading: ProgramsSectionBody;
+}) {
   return (
     <section id="programs" className="scroll-mt-24 bg-white py-16 md:py-24">
       <div className="mx-auto max-w-6xl px-4 md:px-6">
-        <SectionTitle
-          eyebrow="मॉड्यूल"
-          title="कार्यक्रम"
-          subtitle="संरचित मॉड्यूल — उद्देश्य, विषय व गतिविधियाँ"
-        />
+        <SectionTitle eyebrow={heading.eyebrow} title={heading.title} subtitle={heading.subtitle} />
         <div className="grid gap-8 lg:grid-cols-3">
           {courses.map((c, i) => (
             <Reveal key={c.id} delay={i * 90}>

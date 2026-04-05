@@ -4,13 +4,16 @@ import { Reveal } from "@/components/Reveal";
 import { SocialLinks } from "@/components/SocialLinks";
 import { phoneLineToTelHref } from "@/lib/contact-display";
 import type { ContactAddressBlock } from "@/lib/content-types";
+import type { PublicSocialUrls } from "@/lib/public-social";
 
 export function ContactSection({
   addressBlocks,
   phones,
+  socialUrls,
 }: {
   addressBlocks: ContactAddressBlock[];
   phones: string[];
+  socialUrls?: PublicSocialUrls | null;
 }) {
   return (
     <section id="contact" className="scroll-mt-24 bg-slate-100 py-16 md:py-24">
@@ -42,7 +45,7 @@ export function ContactSection({
                   </li>
                 ))}
               </ul>
-              <SocialLinks className="mt-8" />
+              <SocialLinks className="mt-8" urls={socialUrls} />
             </div>
           </Reveal>
           <Reveal delay={120}>

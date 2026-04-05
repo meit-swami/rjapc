@@ -52,13 +52,17 @@ export default async function HomePage() {
       <HeroSection hero={data.hero} />
       <AboutSection title={data.aboutTitle} paragraphs={data.about.paragraphs} />
       <MissionSection title={data.missionTitle} points={data.mission.points} />
-      <ProgramsSection courses={data.courses} />
+      <ProgramsSection courses={data.courses} heading={data.programsSection} />
       <CurriculumSection subjects={data.curriculum.subjects} />
       <ActivitiesSection items={data.activities.items} />
       <TeamSection team={data.team} />
       <WhyJoinSection items={data.whyJoin.items} />
-      <DonationsSection />
-      <ContactSection addressBlocks={data.contact.addressBlocks} phones={data.contact.phones} />
+      <DonationsSection data={data.donations} />
+      <ContactSection
+        addressBlocks={data.contact.addressBlocks}
+        phones={data.contact.phones}
+        socialUrls={data.contact.socialUrls}
+      />
     </>
   );
 }

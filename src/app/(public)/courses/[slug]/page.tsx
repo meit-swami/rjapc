@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AffiliateBookGrid } from "@/components/AffiliateBookGrid";
 import { resolveAffiliateBooksForSlug } from "@/lib/affiliate-books";
+import { getPublicPageData } from "@/lib/public-data";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -44,7 +45,8 @@ export default async function CourseBooksPage({ params }: Props) {
 
   const topics = safeStringArray(course.topics);
   const activities = safeStringArray(course.activities);
-  const books = await resolveAffiliateBooksForSlug(slug);
+  const pageData = await getPublicPageData();
+  const books = await resolveAffiliateBooksForSlug(slug, pageData.affiliateBooksBySlug);
 
   return (
     <div className="bg-slate-50 pb-20 pt-10 md:pt-14">
@@ -94,7 +96,7 @@ export default async function CourseBooksPage({ params }: Props) {
           <div className="mt-8">
             <AffiliateBookGrid
               books={books}
-              emptyMessage="इस मॉड्यूल के लिए अभी कोई पुस्तक लिंक नहीं है। `src/lib/affiliate-books.ts` में इस स्लग हेतु लिंक जोड़ें।"
+              emptyMessage="इस मॉड्यूल के लिए अभी कोई पुस्तक लिंक नहीं है। प्रशासन → सामग्री खंड में `affiliate_books` JSON अपडेट करें।"
             />
           </div>
         </section>

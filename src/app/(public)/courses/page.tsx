@@ -18,7 +18,8 @@ export const metadata: Metadata = {
 };
 
 export default async function CoursesPage() {
-  const [data, allBooks] = await Promise.all([getPublicPageData(), resolveAllAffiliateBooks()]);
+  const data = await getPublicPageData();
+  const allBooks = await resolveAllAffiliateBooks(data.affiliateBooksBySlug);
 
   return (
     <div className="bg-slate-50 pb-20 pt-10 md:pt-14">
@@ -56,7 +57,7 @@ export default async function CoursesPage() {
           <div className="mt-8">
             <AffiliateBookGrid
               books={allBooks}
-              emptyMessage="अभी तक कोई पुस्तक लिंक जोड़ा नहीं गया। `src/lib/affiliate-books.ts` में अपने सहबद्ध URL जोड़ें।"
+              emptyMessage="अभी तक कोई पुस्तक लिंक जोड़ा नहीं गया। प्रशासन → सामग्री खंड में `affiliate_books` JSON में कोर्स स्लग के अनुसार लिंक जोड़ें।"
             />
           </div>
         </div>

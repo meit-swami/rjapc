@@ -33,6 +33,12 @@ export function ContactsAdmin() {
     await load();
   }
 
+  async function remove(id: string) {
+    if (!confirm("यह संदेश स्थायी रूप से हटाएँ?")) return;
+    await fetch(`/api/admin/contacts/${encodeURIComponent(id)}`, { method: "DELETE" });
+    await load();
+  }
+
   return (
     <div className="space-y-4">
       {rows.map((r) => (
@@ -47,13 +53,18 @@ export function ContactsAdmin() {
           <p className="text-sm text-slate-600">{r.email}</p>
           {r.phone ? <p className="text-sm">{r.phone}</p> : null}
           <p className="mt-2 whitespace-pre-wrap text-slate-800 font-devanagari">{r.message}</p>
-          <button
-            type="button"
-            onClick={() => mark(r.id, !r.read)}
-            className="mt-2 text-sm text-saffron font-devanagari"
-          >
-            {r.read ? "अपठित चिह्नित करें" : "पढ़ा चिह्नित करें"}
-          </button>
+          <div className="mt-2 flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={() => mark(r.id, !r.read)}
+              className="text-sm text-saffron font-devanagari"
+            >
+              {r.read ? "अपठित चिह्नित करें" : "पढ़ा चिह्नित करें"}
+            </button>
+            <button type="button" onClick={() => remove(r.id)} className="text-sm text-red-600 font-devanagari">
+              हटाएँ
+            </button>
+          </div>
         </div>
       ))}
       {rows.length === 0 ? <p className="font-devanagari text-slate-500">कोई संदेश नहीं।</p> : null}

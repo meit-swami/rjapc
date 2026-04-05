@@ -4,32 +4,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useLanguage } from "@/components/LanguageProvider";
+import type { SiteChromeBody, SiteNavItem } from "@/lib/content-types";
 
 type Language = "hi" | "en";
 
-type NavItem = { href: string; labelHi: string; labelEn: string };
-
-const mainNav: NavItem[] = [
-  { href: "/#about", labelHi: "परिचय", labelEn: "About" },
-  { href: "/#mission", labelHi: "मिशन", labelEn: "Mission" },
-  { href: "/#programs", labelHi: "कार्यक्रम", labelEn: "Programs" },
-  { href: "/courses", labelHi: "कोर्स", labelEn: "Courses" },
-  { href: "/#donations", labelHi: "दान", labelEn: "Donations" },
-  { href: "/#contact", labelHi: "संपर्क", labelEn: "Contact" },
-  { href: "/blog", labelHi: "ब्लॉग", labelEn: "Blog" },
-];
-
-const knowMoreNav: NavItem[] = [
-  { href: "/curriculum", labelHi: "पाठ्यक्रम", labelEn: "Curriculum" },
-  { href: "/activities", labelHi: "गतिविधियाँ", labelEn: "Activities" },
-  { href: "/team", labelHi: "कोर टीम सदस्य", labelEn: "Core Team Members" },
-  { href: "/why", labelHi: "क्यों हम", labelEn: "Why us" },
-  { href: "/affiliations", labelHi: "सहयोगी", labelEn: "Partners" },
-  { href: "/newsletter", labelHi: "न्यूज़लेटर", labelEn: "Newsletter" },
-  { href: "/media", labelHi: "मीडिया", labelEn: "Media" },
-];
-
-function label(item: NavItem, lang: Language) {
+function label(item: SiteNavItem, lang: Language) {
   return lang === "en" ? item.labelEn : item.labelHi;
 }
 
@@ -39,14 +18,16 @@ function navLinkClass(lang: Language) {
   }`;
 }
 
-export function SiteHeader() {
+export function SiteHeader({ chrome }: { chrome: SiteChromeBody }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [knowMoreOpen, setKnowMoreOpen] = useState(false);
   const [mobileKnowMoreOpen, setMobileKnowMoreOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { language, setLanguage } = useLanguage();
 
-  const knowMoreTrigger = language === "en" ? "Know More" : "और जानें";
+  const { branding, mainNav, knowMoreNav } = chrome;
+  const knowMoreTrigger =
+    language === "en" ? chrome.knowMoreTriggerEn : chrome.knowMoreTriggerHi;
 
   useEffect(() => {
     if (!knowMoreOpen) return;
@@ -84,16 +65,14 @@ export function SiteHeader() {
                 language === "en" ? "font-sans tracking-tight" : "font-devanagari md:text-[1.35rem]"
               }`}
             >
-              {language === "en"
-                ? "Rashtriya Janadesh Promotional Council"
-                : "राष्ट्रीय जनादेश प्रमोशनल काउंसिल"}
+              {language === "en" ? branding.nameEn : branding.nameHi}
             </span>
             <span
               className={`text-[12px] leading-tight text-slate-500 md:text-[13px] ${
                 language === "en" ? "font-sans" : "font-devanagari"
               }`}
             >
-              {language === "en" ? "Political career institute" : "राजनीतिक करियर संस्थान"}
+              {language === "en" ? branding.taglineEn : branding.taglineHi}
             </span>
           </span>
         </Link>

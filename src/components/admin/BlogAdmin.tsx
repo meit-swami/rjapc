@@ -50,6 +50,15 @@ export function BlogAdmin() {
     });
   }
 
+  async function uploadCover(f: File) {
+    const fd = new FormData();
+    fd.set("file", f);
+    const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+    if (!res.ok) return;
+    const j = await res.json();
+    if (j.url) setForm((x) => ({ ...x, coverImage: j.url as string }));
+  }
+
   async function save() {
     const payload = {
       slug: form.slug,
@@ -139,6 +148,15 @@ export function BlogAdmin() {
             value={form.coverImage}
             onChange={(e) => setForm((f) => ({ ...f, coverImage: e.target.value }))}
             className="rounded border px-2 py-1 text-sm"
+          />
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) uploadCover(f);
+            }}
+            className="text-sm"
           />
           <label className="flex items-center gap-2 text-sm font-devanagari">
             <input

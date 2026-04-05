@@ -1,5 +1,7 @@
+import Image from "next/image";
 import { SectionTitle } from "@/components/SectionTitle";
 import { Reveal } from "@/components/Reveal";
+import type { DonationsBody } from "@/lib/content-types";
 
 const MODULES = 29;
 
@@ -37,58 +39,53 @@ function DonationQRPlaceholder({ pixelSize = 200 }: { pixelSize?: number }) {
   );
 }
 
-export function DonationsSection() {
+export function DonationsSection({ data }: { data: DonationsBody }) {
+  const showQrImage = !data.usePlaceholderQr && data.qrImageUrl?.trim();
+
   return (
     <section id="donations" className="scroll-mt-24 bg-white py-14 md:py-24">
       <div className="mx-auto max-w-6xl px-4 md:px-6">
-        <SectionTitle
-          eyebrow="दान"
-          title="संस्था को सहयोग करें"
-          subtitle="नमूना बैंक विवरण व QR — वास्तविक जानकारी जल्द अपडेट की जाएगी"
-        />
+        <SectionTitle eyebrow={data.eyebrow} title={data.title} subtitle={data.subtitle} />
 
         <div className="mt-10 grid gap-8 lg:grid-cols-2 lg:items-stretch lg:gap-10">
           <Reveal>
             <div className="h-full rounded-2xl border border-slate-200 bg-slate-50/80 p-6 shadow-sm md:p-8">
-              <h3 className="text-lg font-bold text-navy font-devanagari md:text-xl">बैंक विवरण (नमूना)</h3>
-              <p className="mt-1 text-xs text-slate-500 font-sans md:text-sm">Dummy bank details — replace before going live</p>
+              <h3 className="text-lg font-bold text-navy font-devanagari md:text-xl">{data.bankCardTitle}</h3>
+              {data.bankCardNote ? (
+                <p className="mt-1 text-xs text-slate-500 font-sans md:text-sm">{data.bankCardNote}</p>
+              ) : null}
               <dl className="mt-6 space-y-4 text-sm md:text-base">
-                <div>
-                  <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500 font-devanagari">लाभार्थी / खाता नाम</dt>
-                  <dd className="mt-1 font-medium text-slate-800 font-devanagari">राष्ट्रीय जनादेश प्रमोशनल काउंसिल (नमूना)</dd>
-                </div>
-                <div>
-                  <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Bank name</dt>
-                  <dd className="mt-1 font-medium text-slate-800">State Bank of India (Sample)</dd>
-                </div>
-                <div>
-                  <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Account number</dt>
-                  <dd className="mt-1 font-mono text-lg font-semibold tracking-wide text-navy">12345678901234</dd>
-                </div>
-                <div>
-                  <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">IFSC code</dt>
-                  <dd className="mt-1 font-mono font-semibold text-slate-800">SBIN0001234</dd>
-                </div>
-                <div>
-                  <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Branch</dt>
-                  <dd className="mt-1 text-slate-800">C-Scheme, Jaipur, Rajasthan (Sample)</dd>
-                </div>
-                <div>
-                  <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">UPI (sample)</dt>
-                  <dd className="mt-1 font-mono text-slate-800">rjapc.donate@samplebank</dd>
-                </div>
+                {data.bankRows.map((row) => (
+                  <div key={`${row.dt}-${row.dd.slice(0, 24)}`}>
+                    <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500 font-devanagari">
+                      {row.dt}
+                    </dt>
+                    <dd className="mt-1 font-medium text-slate-800 font-devanagari whitespace-pre-wrap">{row.dd}</dd>
+                  </div>
+                ))}
               </dl>
             </div>
           </Reveal>
 
           <Reveal delay={100}>
             <div className="flex h-full flex-col items-center justify-center rounded-2xl border border-slate-200 bg-gradient-to-b from-slate-50 to-white p-6 shadow-sm md:p-8">
-              <h3 className="text-center text-lg font-bold text-navy font-devanagari md:text-xl">UPI / QR (नमूना)</h3>
-              <p className="mt-2 max-w-sm text-center text-xs text-slate-500 md:text-sm">
-                यह एक नमूना QR पैटर्न है; वास्तविक भुगतान के लिए अपना QR यहाँ लगाएँ।
-              </p>
+              <h3 className="text-center text-lg font-bold text-navy font-devanagari md:text-xl">{data.qrCardTitle}</h3>
+              {data.qrNote ? (
+                <p className="mt-2 max-w-sm text-center text-xs text-slate-500 md:text-sm font-devanagari">{data.qrNote}</p>
+              ) : null}
               <div className="mt-8 flex w-full justify-center">
-                <DonationQRPlaceholder pixelSize={220} />
+                {showQrImage ? (
+                  <Image
+                    src={data.qrImageUrl!.trim()}
+                    alt={data.qrCardTitle}
+                    width={220}
+                    height={220}
+                    className="h-auto w-full max-w-[220px] rounded-xl border border-slate-200 bg-white p-2 shadow-inner object-contain"
+                    unoptimized
+                  />
+                ) : (
+                  <DonationQRPlaceholder pixelSize={220} />
+                )}
               </div>
             </div>
           </Reveal>

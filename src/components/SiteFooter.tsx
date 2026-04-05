@@ -1,40 +1,35 @@
 import Link from "next/link";
 import { SocialLinks } from "@/components/SocialLinks";
 import { phoneLineToTelHref } from "@/lib/contact-display";
-import type { ContactAddressBlock } from "@/lib/content-types";
+import type { ContactAddressBlock, SiteChromeBody } from "@/lib/content-types";
+import type { PublicSocialUrls } from "@/lib/public-social";
 
 export function SiteFooter({
   phones = [],
   addressBlocks = [],
+  footer,
+  socialUrls,
 }: {
   phones?: string[];
   addressBlocks?: ContactAddressBlock[];
+  footer: SiteChromeBody["footer"];
+  socialUrls?: PublicSocialUrls | null;
 }) {
   return (
     <footer className="border-t border-slate-200 bg-white">
       <div className="mx-auto max-w-6xl px-4 py-10 md:px-6">
         <div className="flex flex-col gap-8 md:flex-row md:justify-between">
           <div>
-            <p className="font-devanagari text-lg font-bold text-navy">राष्ट्रीय जनादेश प्रमोशनल काउंसिल</p>
-            <p className="mt-1 text-sm text-slate-600 font-devanagari">राजनीतिक शिक्षा का उच्च शिक्षण संस्थान</p>
-            <SocialLinks className="mt-5" />
+            <p className="font-devanagari text-lg font-bold text-navy">{footer.brandHi}</p>
+            <p className="mt-1 text-sm text-slate-600 font-devanagari">{footer.tagHi}</p>
+            <SocialLinks className="mt-5" urls={socialUrls} />
           </div>
           <div className="flex flex-wrap gap-4 text-sm text-slate-600">
-            <Link href="/blog" className="hover:text-saffron font-devanagari">
-              ब्लॉग
-            </Link>
-            <Link href="/affiliations" className="hover:text-saffron font-devanagari">
-              सहयोगी
-            </Link>
-            <Link href="/newsletter" className="hover:text-saffron font-devanagari">
-              न्यूज़लेटर
-            </Link>
-            <Link href="/media" className="hover:text-saffron font-devanagari">
-              मीडिया
-            </Link>
-            <Link href="/admin/login" className="hover:text-saffron">
-              प्रशासन
-            </Link>
+            {footer.links.map((item) => (
+              <Link key={item.href} href={item.href} className="hover:text-saffron font-devanagari">
+                {item.labelHi}
+              </Link>
+            ))}
           </div>
         </div>
 
@@ -71,7 +66,7 @@ export function SiteFooter({
         )}
       </div>
       <div className="border-t border-slate-100 bg-slate-50 py-4 text-center text-xs text-slate-500 font-devanagari">
-        © {new Date().getFullYear()} राष्ट्रीय जनादेश प्रमोशनल काउंसिल. सर्वाधिकार सुरक्षित.
+        © {new Date().getFullYear()} {footer.copyrightRestHi}
       </div>
     </footer>
   );

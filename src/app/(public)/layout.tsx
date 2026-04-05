@@ -10,9 +10,14 @@ export default async function PublicLayout({ children }: { children: React.React
   return (
     <LanguageProvider>
       <SplashIntro />
-      <SiteHeader />
+      <SiteHeader chrome={data.siteChrome} />
       <main>{children}</main>
-      <SiteFooter phones={data.contact.phones} addressBlocks={data.contact.addressBlocks} />
+      <SiteFooter
+        phones={data.contact.phones}
+        addressBlocks={data.contact.addressBlocks}
+        footer={data.siteChrome.footer}
+        socialUrls={data.contact.socialUrls}
+      />
       <WhatsAppFloat />
     </LanguageProvider>
   );

@@ -23,3 +23,14 @@ export async function PATCH(req: Request, { params }: Params) {
   });
   return NextResponse.json(row);
 }
+
+export async function DELETE(_req: Request, { params }: Params) {
+  if (!(await requireAdmin())) return unauthorized();
+  const { id } = await params;
+  try {
+    await prisma.contactSubmission.delete({ where: { id } });
+    return NextResponse.json({ ok: true });
+  } catch {
+    return NextResponse.json({ error: "नहीं मिला" }, { status: 404 });
+  }
+}

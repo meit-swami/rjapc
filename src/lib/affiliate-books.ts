@@ -46,15 +46,20 @@ export type ResolvedAffiliateBook = {
   savingsDisplay?: string;
 };
 
-export async function resolveAffiliateBooksForSlug(slug: string): Promise<ResolvedAffiliateBook[]> {
-  const entries = AFFILIATE_BOOKS_BY_COURSE_SLUG[slug] ?? [];
+export async function resolveAffiliateBooksForSlug(
+  slug: string,
+  bySlug?: Record<string, AffiliateBookLink[]>
+): Promise<ResolvedAffiliateBook[]> {
+  const map = bySlug ?? AFFILIATE_BOOKS_BY_COURSE_SLUG;
+  const entries = map[slug] ?? [];
   return Promise.all(entries.map((e) => resolveOne(e)));
 }
 
-export async function resolveAllAffiliateBooks(): Promise<
-  Array<ResolvedAffiliateBook & { courseSlug: string }>
-> {
-  const pairs = Object.entries(AFFILIATE_BOOKS_BY_COURSE_SLUG).flatMap(([courseSlug, list]) =>
+export async function resolveAllAffiliateBooks(
+  bySlug?: Record<string, AffiliateBookLink[]>
+): Promise<Array<ResolvedAffiliateBook & { courseSlug: string }>> {
+  const map = bySlug ?? AFFILIATE_BOOKS_BY_COURSE_SLUG;
+  const pairs = Object.entries(map).flatMap(([courseSlug, list]) =>
     list.map((e) => ({ courseSlug, e }))
   );
   const resolved = await Promise.all(pairs.map(({ e }) => resolveOne(e)));

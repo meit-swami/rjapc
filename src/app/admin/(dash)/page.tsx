@@ -2,15 +2,17 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 
 export default async function AdminDashboardPage() {
-  const [courses, team, contacts, posts, subs] = await Promise.all([
+  const [courses, team, contacts, posts, subs, contentKeys] = await Promise.all([
     prisma.course.count(),
     prisma.teamMember.count(),
     prisma.contactSubmission.count({ where: { read: false } }),
     prisma.blogPost.count(),
     prisma.newsletterSubscriber.count(),
+    prisma.contentSection.count(),
   ]);
 
   const cards = [
+    { label: "सामग्री खंड (कुंजी)", value: contentKeys, href: "/admin/content" },
     { label: "पाठ्यक्रम", value: courses, href: "/admin/courses" },
     { label: "टीम सदस्य", value: team, href: "/admin/team" },
     { label: "अपठित संदेश", value: contacts, href: "/admin/contacts" },

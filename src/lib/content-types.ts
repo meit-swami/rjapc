@@ -31,6 +31,14 @@ export type ContactBody = {
   addressLine?: string;
   /** Two (or more) labelled addresses, e.g. पंजीकृत कार्यालय + Office */
   addressBlocks?: ContactAddressBlock[];
+  /** Profile or page URLs — footer & contact (overrides NEXT_PUBLIC_* when set) */
+  instagramUrl?: string | null;
+  facebookUrl?: string | null;
+  xUrl?: string | null;
+  youtubeUrl?: string | null;
+  linkedinUrl?: string | null;
+  /** Full https://wa.me/... or override; else derived from NEXT_PUBLIC_WHATSAPP_NUMBER */
+  whatsappUrl?: string | null;
 };
 
 export type AffiliationItem = {
@@ -59,6 +67,58 @@ export type MediaItem = {
 
 export type MediaBody = {
   items: MediaItem[];
+};
+
+/** Homepage programs block heading (cards still come from Course model). */
+export type ProgramsSectionBody = {
+  eyebrow: string;
+  title: string;
+  subtitle: string;
+};
+
+export type DonationBankRow = {
+  dt: string;
+  dd: string;
+};
+
+/** Donations / bank + QR block on homepage. */
+export type DonationsBody = {
+  eyebrow: string;
+  title: string;
+  subtitle: string;
+  bankCardTitle: string;
+  bankCardNote: string;
+  bankRows: DonationBankRow[];
+  qrCardTitle: string;
+  qrNote: string;
+  usePlaceholderQr: boolean;
+  qrImageUrl: string | null;
+};
+
+export type SiteNavItem = {
+  href: string;
+  labelHi: string;
+  labelEn: string;
+};
+
+export type SiteChromeBody = {
+  branding: {
+    nameHi: string;
+    nameEn: string;
+    taglineHi: string;
+    taglineEn: string;
+  };
+  mainNav: SiteNavItem[];
+  knowMoreNav: SiteNavItem[];
+  knowMoreTriggerHi: string;
+  knowMoreTriggerEn: string;
+  footer: {
+    brandHi: string;
+    tagHi: string;
+    /** Text after the © year, e.g. organisation name and rights line */
+    copyrightRestHi: string;
+    links: { href: string; labelHi: string }[];
+  };
 };
 
 export function parseJson<T>(raw: string, fallback: T): T {
