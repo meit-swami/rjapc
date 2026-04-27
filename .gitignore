@@ -19,7 +19,7 @@ npm-debug.log*
 # keep migrations if you add them later
 
 # uploads (keep folder)
-/public/uploads/*
+#/public/uploads/*
 !/public/uploads/.gitkeep
 
 # IDE
