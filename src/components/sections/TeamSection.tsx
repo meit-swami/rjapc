@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { SectionTitle } from "@/components/SectionTitle";
 import { Reveal } from "@/components/Reveal";
 
@@ -12,12 +13,27 @@ export type TeamCard = {
 };
 
 export function TeamSection({ team }: { team: TeamCard[] }) {
+  const uniqueTopTeam = team
+    .filter((m) => m.nameHi !== "अन्य सदस्य")
+    .filter((m, idx, arr) => arr.findIndex((x) => x.nameHi === m.nameHi) === idx)
+    .slice(0, 4);
+
   return (
     <section id="team" className="scroll-mt-24 bg-slate-50 py-16 md:py-24">
       <div className="mx-auto max-w-6xl px-4 md:px-6">
-        <SectionTitle eyebrow="टीम" title="नेतृत्व" subtitle="अनुभव, प्रतिबद्धता व मार्गदर्शन" />
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {team.map((m, i) => (
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <SectionTitle eyebrow="टीम" title="नेतृत्व" subtitle="अनुभव, प्रतिबद्धता व मार्गदर्शन" />
+          <Link
+            href="/team"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex h-fit items-center justify-center self-start rounded-xl border border-navy/20 bg-white px-4 py-2 text-sm font-semibold text-navy shadow-sm transition hover:border-saffron hover:text-saffron"
+          >
+            View All Team members
+          </Link>
+        </div>
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-4">
+          {uniqueTopTeam.map((m, i) => (
             <Reveal key={m.id} delay={i * 80}>
               <article className="card-hover flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg">
                 <div className="relative aspect-[4/3] bg-gradient-to-br from-navy to-slate-800">
@@ -27,7 +43,7 @@ export function TeamSection({ team }: { team: TeamCard[] }) {
                       alt={m.nameHi}
                       fill
                       className="object-contain object-center"
-                      sizes="(max-width:768px) 100vw, 33vw"
+                      sizes="(max-width:768px) 100vw, 25vw"
                     />
                   ) : (
                     <div className="flex h-full items-center justify-center text-6xl font-bold text-white/25 font-devanagari">

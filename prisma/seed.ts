@@ -292,22 +292,31 @@ async function main() {
       photoUrl: "/uploads/Person/2.jpg",
     },
     {
-      nameHi: "Shiv Kumar Sharma",
-      designation: "कार्यक्रम प्रमुख",
+      nameHi: "Dr. Inderjeet Rao",
+      designation: "राष्ट्रीय संयोजक",
       description:
-        "प्रशिक्षण सत्र, मैदानी गतिविधियों और प्रतिभागी विकास का समन्वय।",
+        "राष्ट्रीय स्तर पर संगठनात्मक समन्वय, सदस्य संवाद और कार्यक्रम योजना में सक्रिय भूमिका।",
       sortOrder: 3,
       isFounder: false,
-      photoUrl: "/uploads/Person/3.jpg",
+      photoUrl: "/uploads/Person/11.png",
     },
     {
       nameHi: "Lokesh Kumar Sharma",
-      designation: "संचालन एवं बाहरी समन्वय",
+      designation: "राष्ट्रीय उपाध्यक्ष, संगठन",
       description:
-        "संस्थागत संचालन, साझेदारी और सामुदायिक जुड़ाव में सक्रिय भूमिका।",
+        "संगठन में राष्ट्रीय उपाध्यक्ष के रूप में सदस्य समन्वय व कार्यक्रम दिशा में सक्रिय; नैतिक राजनीति व संस्था के मिशन के प्रति प्रतिबद्ध।",
       sortOrder: 4,
       isFounder: false,
-      photoUrl: "/uploads/Person/4.jpg",
+      photoUrl: "/uploads/Person/13.jpg",
+    },
+    {
+      nameHi: "Deepesh Bohra",
+      designation: "कोषाध्यक्ष",
+      description:
+        "संस्था के वित्तीय अभिलेख, बजट प्रबंधन और पारदर्शी लेखा संचालन का दायित्व संभालते हैं।",
+      sortOrder: 5,
+      isFounder: false,
+      photoUrl: "/uploads/Person/12.png",
     },
   ];
 

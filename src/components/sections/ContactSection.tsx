@@ -49,7 +49,10 @@ export function ContactSection({
             </div>
           </Reveal>
           <Reveal delay={120}>
-            <ContactForm />
+            <div id="feedback" className="scroll-mt-24">
+              <p className="mb-3 text-sm font-semibold text-navy font-devanagari">फीडबैक सेक्शन</p>
+              <ContactForm />
+            </div>
           </Reveal>
         </div>
         <p className="mt-10 text-center text-sm text-slate-600 font-devanagari">

@@ -1,24 +1,37 @@
 "use client";
 
-import Image from "next/image";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-const STORAGE_KEY = "rjapc-splash-seen";
 const MIN_MS = 2000;
 const FADE_MS = 500;
 
 export function SplashIntro() {
   const [phase, setPhase] = useState<"hidden" | "show" | "fade">("show");
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  useLayoutEffect(() => {
-    try {
-      if (sessionStorage.getItem(STORAGE_KEY)) {
-        setPhase("hidden");
+  useEffect(() => {
+    if (phase !== "show") return;
+    const el = videoRef.current;
+    if (!el) return;
+
+    const applyPlaybackRate = () => {
+      try {
+        el.playbackRate = 1.25;
+      } catch {
+        /* ignore */
       }
-    } catch {
-      /* private mode / blocked storage */
-    }
-  }, []);
+    };
+
+    applyPlaybackRate();
+    el.addEventListener("loadedmetadata", applyPlaybackRate);
+
+    // Autoplay can fail if the browser blocks it; we keep the overlay regardless.
+    el.play().catch(() => {});
+
+    return () => {
+      el.removeEventListener("loadedmetadata", applyPlaybackRate);
+    };
+  }, [phase]);
 
   useEffect(() => {
     if (phase !== "show") return;
@@ -32,11 +45,6 @@ export function SplashIntro() {
       window.setTimeout(() => {
         if (cancelled) return;
         setPhase("fade");
-        try {
-          sessionStorage.setItem(STORAGE_KEY, "1");
-        } catch {
-          /* ignore */
-        }
         window.setTimeout(() => {
           if (!cancelled) setPhase("hidden");
         }, FADE_MS);
@@ -59,27 +67,23 @@ export function SplashIntro() {
 
   return (
     <div
-      className={`fixed inset-0 z-[200] flex flex-col items-center justify-center gap-6 bg-gradient-to-b from-slate-50 via-white to-slate-100 transition-opacity duration-500 ease-out ${
+      className={`fixed inset-0 z-[200] flex items-center justify-center bg-black transition-opacity duration-500 ease-out ${
         phase === "fade" ? "pointer-events-none opacity-0" : "opacity-100"
       }`}
       aria-hidden={phase === "fade"}
     >
-      <div className="relative mx-6 w-full max-w-md animate-splash-in">
-        <Image
-          src="/uploads/logo.png"
-          alt=""
-          width={640}
-          height={640}
-          className="h-auto w-full object-contain drop-shadow-sm"
-          priority
-        />
-      </div>
-      <div
-        className="h-1 w-32 overflow-hidden rounded-full bg-slate-200"
-        aria-hidden
+      <video
+        ref={videoRef}
+        className="h-[92vh] w-[92vw] max-w-6xl rounded-xl object-contain"
+        autoPlay
+        muted
+        playsInline
+        loop
+        preload="auto"
+        aria-label="Intro video"
       >
-        <div className="h-full w-1/3 animate-splash-bar rounded-full bg-saffron" />
-      </div>
+        <source src="/uploads/Videos/Chanakya.mp4" type="video/mp4" />
+      </video>
     </div>
   );
 }

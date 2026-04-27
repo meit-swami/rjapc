@@ -3,6 +3,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { WhatsAppFloat } from "@/components/WhatsAppFloat";
 import { LanguageProvider } from "@/components/LanguageProvider";
 import { SplashIntro } from "@/components/SplashIntro";
+import { ConstructionNoticePopup } from "@/components/ConstructionNoticePopup";
 import { getPublicPageData } from "@/lib/public-data";
 
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
@@ -10,6 +11,7 @@ export default async function PublicLayout({ children }: { children: React.React
   return (
     <LanguageProvider>
       <SplashIntro />
+      <ConstructionNoticePopup />
       <SiteHeader chrome={data.siteChrome} />
       <main>{children}</main>
       <SiteFooter
