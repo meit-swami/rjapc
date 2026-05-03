@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { TeamCardReadMore } from "@/components/TeamCardReadMore";
 import type { TeamCard } from "./TeamSection";
 
 export function CoreTeamMembersPage({ team }: { team: TeamCard[] }) {
@@ -47,13 +48,14 @@ export function CoreTeamMembersPage({ team }: { team: TeamCard[] }) {
                     </span>
                   ) : null}
                 </div>
-                <div className="flex flex-1 flex-col p-4 md:p-5">
-                  <h2 className="text-base font-bold text-navy font-devanagari md:text-lg">{m.nameHi}</h2>
-                  <p className="mt-1 text-xs font-semibold text-saffron font-devanagari md:text-sm">{m.designation}</p>
-                  <p className="mt-2 line-clamp-4 flex-1 text-xs text-slate-600 font-devanagari leading-relaxed md:text-sm md:line-clamp-5">
-                    {m.description}
-                  </p>
-                </div>
+                <TeamCardReadMore
+                  member={m}
+                  nameHeadingTag="h2"
+                  contentWrapperClassName="flex flex-1 flex-col p-4 md:p-5"
+                  nameHeadingClassName="text-base font-bold text-navy font-devanagari md:text-lg"
+                  designationClassName="mt-1 text-xs font-semibold text-saffron font-devanagari md:text-sm"
+                  previewTextClassName="mt-2 line-clamp-4 flex-1 text-xs text-slate-600 font-devanagari leading-relaxed md:text-sm md:line-clamp-5"
+                />
               </article>
             ))}
           </div>

@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { SectionTitle } from "@/components/SectionTitle";
 import { Reveal } from "@/components/Reveal";
+import { TeamCardReadMore } from "@/components/TeamCardReadMore";
 import { isExcludedFromHomepageTeam } from "@/lib/team-filter";
 
 export type TeamCard = {
@@ -58,13 +59,15 @@ export function TeamSection({ team }: { team: TeamCard[] }) {
                     </span>
                   ) : null}
                 </div>
-                <div className="flex flex-1 flex-col p-6">
-                  <h3 className="text-xl font-bold text-navy font-devanagari">{m.nameHi}</h3>
-                  <p className="mt-1 text-sm font-semibold text-saffron font-devanagari">{m.designation}</p>
-                  <p className="mt-3 flex-1 text-slate-600 font-devanagari leading-relaxed">{m.description}</p>
-                </div>
+                <TeamCardReadMore
+                  member={m}
+                  contentWrapperClassName="flex flex-1 flex-col p-6"
+                  nameHeadingTag="h3"
+                  nameHeadingClassName="text-xl font-bold text-navy font-devanagari"
+                  designationClassName="mt-1 text-sm font-semibold text-saffron font-devanagari"
+                  previewTextClassName="mt-3 line-clamp-4 flex-1 text-slate-600 font-devanagari leading-relaxed"
+                />
               </article>
-         
             </Reveal>
           ))}
         </div>
