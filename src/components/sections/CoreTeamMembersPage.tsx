@@ -2,6 +2,8 @@ import Image from "next/image";
 import type { TeamCard } from "./TeamSection";
 
 export function CoreTeamMembersPage({ team }: { team: TeamCard[] }) {
+  const visibleTeam = team.filter((m) => !m.nameHi.toLowerCase().includes("arun choudhary"));
+
   return (
     <main className="min-h-screen bg-slate-50 py-12 md:py-16">
       <div className="mx-auto max-w-7xl px-4 md:px-6">
@@ -16,11 +18,11 @@ export function CoreTeamMembersPage({ team }: { team: TeamCard[] }) {
           </p>
         </header>
 
-        {team.length === 0 ? (
+        {visibleTeam.length === 0 ? (
           <p className="py-16 text-center text-slate-500 font-devanagari">कोई सदस्य सूचीबद्ध नहीं है।</p>
         ) : (
           <div className="grid grid-cols-1 gap-5 md:grid-cols-4">
-            {team.map((m) => (
+            {visibleTeam.map((m) => (
               <article
                 key={m.id}
                 className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md transition-shadow hover:shadow-lg"

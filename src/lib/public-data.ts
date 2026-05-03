@@ -19,6 +19,7 @@ import { parseJson } from "@/lib/content-types";
 import { AFFILIATE_BOOKS_BY_COURSE_SLUG, type AffiliateBookLink } from "@/lib/affiliate-books";
 import { filterPublicTeamMembers } from "@/lib/team-filter";
 import {
+  DEFAULT_SITE_CHROME,
   mergeDonationsBody,
   mergeProgramsSection,
   mergeSiteChrome,
@@ -109,6 +110,59 @@ function mergeAffiliateBooksFromDb(bodyStr: string): Record<string, AffiliateBoo
 }
 
 export const getPublicPageData = cache(async function getPublicPageData() {
+  const [affiliationFiles, mediaFiles, newsletterFiles] = await Promise.all([
+    scanAffiliationLogos(),
+    scanMediaFolder(),
+    scanNewsletterFolder(),
+  ]);
+
+  const fallbackContact = upgradeLegacyContactBody(
+    parseJson<ContactBody>("{}", {
+      phones: [],
+      addressBlocks: [],
+    })
+  );
+
+  const fallback = {
+    aboutTitle: "हमारे बारे में",
+    missionTitle: "हमारा मिशन",
+    hero: {
+      title: DEFAULT_SITE_CHROME.branding.nameHi,
+      subtitle: DEFAULT_SITE_CHROME.footer.tagHi,
+      tagline: DEFAULT_SITE_CHROME.branding.taglineHi,
+      backgroundImageUrl: null,
+    },
+    about: { paragraphs: [] },
+    mission: { points: [] },
+    curriculum: { subjects: [] },
+    activities: { items: [] },
+    whyJoin: { items: [] },
+    contact: {
+      ...normalizePublicContact(fallbackContact),
+      socialUrls: mergePublicSocialUrls(fallbackContact),
+    },
+    seo: {},
+    affiliationsTitle: "सहयोगी संस्थाएँ",
+    affiliations: { items: mergeAffiliations([], affiliationFiles) },
+    newsletterTitle: "न्यूज़लेटर",
+    newsletter: { subtitle: "" },
+    newsletterAttachments: newsletterFiles,
+    mediaTitle: "Media",
+    media: { items: mergeMediaItems(mediaFiles, []) },
+    courses: [],
+    team: [],
+    blogPosts: [],
+    programsSection: mergeProgramsSection({}),
+    donations: mergeDonationsBody({}),
+    siteChrome: mergeSiteChrome({}),
+    affiliateBooksBySlug: mergeAffiliateBooksFromDb("{}"),
+  };
+
+  if (!process.env.DATABASE_URL) {
+    return fallback;
+  }
+
+  try {
   const sections = await prisma.contentSection.findMany();
   const map = Object.fromEntries(sections.map((s) => [s.key, s]));
 
@@ -137,12 +191,6 @@ export const getPublicPageData = cache(async function getPublicPageData() {
     where: { published: true },
     orderBy: { sortOrder: "asc" },
   });
-
-  const [affiliationFiles, mediaFiles, newsletterFiles] = await Promise.all([
-    scanAffiliationLogos(),
-    scanMediaFolder(),
-    scanNewsletterFolder(),
-  ]);
 
   const posts = await prisma.blogPost.findMany({
     where: { published: true },
@@ -229,6 +277,9 @@ export const getPublicPageData = cache(async function getPublicPageData() {
     siteChrome: mergeSiteChrome(parseJson<Partial<SiteChromeBody>>(siteChromeSec?.body ?? "{}", {})),
     affiliateBooksBySlug: mergeAffiliateBooksFromDb(affiliateBooksSec?.body ?? "{}"),
   };
+  } catch {
+    return fallback;
+  }
 });
 
 function safeStringArray(json: string): string[] {
