@@ -102,9 +102,10 @@ function mergeAffiliateBooksFromDb(bodyStr: string): Record<string, AffiliateBoo
   ]);
   const out: Record<string, AffiliateBookLink[]> = {};
   for (const slug of slugs) {
-    out[slug] = Object.prototype.hasOwnProperty.call(fromDb, slug)
-      ? fromDb[slug]!
-      : (AFFILIATE_BOOKS_BY_COURSE_SLUG[slug] ?? []);
+    const dbList = fromDb[slug];
+    const fallback = AFFILIATE_BOOKS_BY_COURSE_SLUG[slug] ?? [];
+    /** DB में कम से कम एक आइटम हो तो DB; वरना कोड डिफ़ॉल्ट (पुराना `[]` सीड अब नए डिफ़ॉल्ट ओवरराइड नहीं करेगा)। */
+    out[slug] = dbList && dbList.length > 0 ? dbList : fallback;
   }
   return out;
 }

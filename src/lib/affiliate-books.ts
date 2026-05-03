@@ -32,7 +32,27 @@ export const AFFILIATE_BOOKS_BY_COURSE_SLUG: Record<string, AffiliateBookLink[]>
     },
     // Add more foundation-module books below (same shape). Append ?tag=your-affiliate-id to href when ready.
   ],
-  "core-module": [],
+  /** Covers in `public/uploads/Courses/`. Amazon लिंक जोड़ने पर `href` अपडेट करें। */
+  "core-module": [
+    {
+      href: "/?inquiry=bhartiya-arthvyavastha-aur-vikas-nitiya#contact",
+      titleFallback: "भारतीय अर्थव्यवस्था और विकास नीतियां",
+      authorDisplay: "रमेश बोहरा",
+      priceDisplay: "₹360.00 incl. GST",
+      mrpDisplay: "M.R.P.: ₹480.00",
+      savingsDisplay: "Save: ₹120.00 (25%)",
+      imageOverride: "/uploads/Courses/Bhartiya-Arthvyavastha-aur-Vikas-Nitiya.jpeg",
+    },
+    {
+      href: "/?inquiry=niti-nirman-aur-prashnik-pranali#contact",
+      titleFallback: "नीति निर्माण और प्रशासनिक प्रणाली",
+      authorDisplay: "रमेश बोहरा",
+      priceDisplay: "₹360.00 incl. GST",
+      mrpDisplay: "M.R.P.: ₹480.00",
+      savingsDisplay: "Save: ₹120.00 (25%)",
+      imageOverride: "/uploads/Courses/Niti-Nirman-aur-Prashnik-pranali.jpeg",
+    },
+  ],
   "skill-module": [],
 };
 

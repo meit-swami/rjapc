@@ -64,6 +64,7 @@ export function TeamSection({ team }: { team: TeamCard[] }) {
                   <p className="mt-3 flex-1 text-slate-600 font-devanagari leading-relaxed">{m.description}</p>
                 </div>
               </article>
+         
             </Reveal>
           ))}
         </div>

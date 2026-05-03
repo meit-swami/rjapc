@@ -18,12 +18,14 @@ export function AffiliateBookGrid({
 
   return (
     <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-      {books.map((book) => (
-        <li key={book.href}>
+      {books.map((book, index) => {
+        const offsite = /^https?:\/\//i.test(book.href);
+        return (
+        <li key={`${book.href}-${book.title}-${index}`}>
           <a
             href={book.href}
-            target="_blank"
-            rel="nofollow sponsored noopener noreferrer"
+            target={offsite ? "_blank" : undefined}
+            rel={offsite ? "nofollow sponsored noopener noreferrer" : undefined}
             className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md transition hover:-translate-y-0.5 hover:border-saffron/40 hover:shadow-lg"
           >
             <div className="relative aspect-[3/4] w-full bg-slate-100">
@@ -67,7 +69,8 @@ export function AffiliateBookGrid({
             </div>
           </a>
         </li>
-      ))}
+        );
+      })}
     </ul>
   );
 }
