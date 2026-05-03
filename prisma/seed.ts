@@ -283,13 +283,13 @@ async function main() {
       photoUrl: "/uploads/Person/1.jpg",
     },
     {
-      nameHi: "Dr. Arun Choudhary",
-      designation: "विशेषज्ञ सलाहकार / शिक्षण बोर्ड",
+      nameHi: "Lokesh K. Sharma",
+      designation: "राष्ट्रीय महासचिव",
       description:
-        "शैक्षणिक अनुभव के साथ पाठ्यक्रम डिज़ाइन और अनुसंधान दिशा में सहयोग।",
+        "राष्ट्रीय महासचिव के रूप में संगठनात्मक समन्वय, प्रशासनिक संचालन व कार्यक्रम दिशा में सक्रिय; नैतिक राजनीति व संस्था के मिशन के प्रति प्रतिबद्ध।",
       sortOrder: 2,
       isFounder: false,
-      photoUrl: "/uploads/Person/2.jpg",
+      photoUrl: "/uploads/Person/13.jpg",
     },
     {
       nameHi: "Dr. Inderjeet Rao",
@@ -301,28 +301,39 @@ async function main() {
       photoUrl: "/uploads/Person/11.png",
     },
     {
-      nameHi: "Lokesh Kumar Sharma",
-      designation: "राष्ट्रीय उपाध्यक्ष, संगठन",
-      description:
-        "संगठन में राष्ट्रीय उपाध्यक्ष के रूप में सदस्य समन्वय व कार्यक्रम दिशा में सक्रिय; नैतिक राजनीति व संस्था के मिशन के प्रति प्रतिबद्ध।",
-      sortOrder: 4,
-      isFounder: false,
-      photoUrl: "/uploads/Person/13.jpg",
-    },
-    {
       nameHi: "Deepesh Bohra",
       designation: "कोषाध्यक्ष",
       description:
         "संस्था के वित्तीय अभिलेख, बजट प्रबंधन और पारदर्शी लेखा संचालन का दायित्व संभालते हैं।",
-      sortOrder: 5,
+      sortOrder: 4,
       isFounder: false,
       photoUrl: "/uploads/Person/12.png",
     },
+    {
+      nameHi: "Dr. Arun Choudhary",
+      designation: "विशेषज्ञ सलाहकार / शिक्षण बोर्ड",
+      description:
+        "शैक्षणिक अनुभव के साथ पाठ्यक्रम डिज़ाइन और अनुसंधान दिशा में सहयोग।",
+      sortOrder: 5,
+      isFounder: false,
+      photoUrl: "/uploads/Person/2.jpg",
+    },
   ];
+
+  /** Match seed row to DB by current `nameHi`, or legacy name after rename (नाम बदलने पर भी एक ही रिकॉर्ड अपडेट हो). */
+  function seedLookupWhere(nameHi: string) {
+    const legacyByNewName: Record<string, string> = {
+      "Lokesh K. Sharma": "Lokesh Kumar Sharma",
+    };
+    const legacy = legacyByNewName[nameHi];
+    return legacy
+      ? { OR: [{ nameHi }, { nameHi: legacy }] }
+      : { nameHi };
+  }
 
   for (const m of team) {
     const existing = await prisma.teamMember.findFirst({
-      where: { sortOrder: m.sortOrder },
+      where: seedLookupWhere(m.nameHi),
     });
     if (existing) {
       await prisma.teamMember.update({
