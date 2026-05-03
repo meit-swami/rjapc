@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useCallback, useEffect, useId, useState } from "react";
 import type { TeamCard } from "@/components/sections/TeamSection";
 
@@ -73,9 +74,9 @@ export function TeamCardReadMore({
             aria-modal="true"
             aria-labelledby={titleId}
             aria-describedby={descId}
-            className="relative z-[101] max-h-[min(85vh,640px)] w-full max-w-lg overflow-y-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl"
+            className="relative z-[101] max-h-[min(90vh,720px)] w-full max-w-2xl overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-2xl"
           >
-            <div className="flex items-start justify-between gap-3 border-b border-slate-100 pb-4">
+            <div className="sticky top-0 z-10 flex items-start justify-between gap-3 border-b border-slate-100 bg-white px-5 py-4">
               <div>
                 <h2 id={titleId} className="text-xl font-bold text-navy font-devanagari">
                   {member.nameHi}
@@ -90,9 +91,28 @@ export function TeamCardReadMore({
                 बंद करें
               </button>
             </div>
-            <p id={descId} className="mt-4 whitespace-pre-wrap text-slate-700 font-devanagari leading-relaxed">
-              {member.description}
-            </p>
+
+            <div className="flex flex-col gap-4 px-5 pb-6 pt-4 sm:flex-row sm:items-start">
+              <div className="relative mx-auto aspect-[4/3] w-full max-w-[220px] shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-navy to-slate-800 sm:mx-0">
+                {member.photoUrl ? (
+                  <Image
+                    src={member.photoUrl}
+                    alt={member.nameHi}
+                    fill
+                    className="object-contain object-center"
+                    sizes="220px"
+                    unoptimized
+                  />
+                ) : (
+                  <div className="flex h-full min-h-[140px] items-center justify-center text-4xl font-bold text-white/30 font-devanagari">
+                    {member.nameHi.slice(0, 1)}
+                  </div>
+                )}
+              </div>
+              <p id={descId} className="min-w-0 flex-1 whitespace-pre-wrap text-slate-700 font-devanagari leading-relaxed">
+                {member.description}
+              </p>
+            </div>
           </div>
         </div>
       ) : null}
