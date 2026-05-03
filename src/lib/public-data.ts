@@ -17,7 +17,7 @@ import type {
 } from "@/lib/content-types";
 import { parseJson } from "@/lib/content-types";
 import { AFFILIATE_BOOKS_BY_COURSE_SLUG, type AffiliateBookLink } from "@/lib/affiliate-books";
-import { filterPublicTeamMembers } from "@/lib/team-filter";
+import { filterPublicTeamMembers, mapPublicTeamMember } from "@/lib/team-filter";
 import {
   DEFAULT_SITE_CHROME,
   mergeDonationsBody,
@@ -141,7 +141,7 @@ export const getPublicPageData = cache(async function getPublicPageData() {
       ...normalizePublicContact(fallbackContact),
       socialUrls: mergePublicSocialUrls(fallbackContact),
     },
-    seo: {},
+    seo: {} as { title?: string; description?: string },
     affiliationsTitle: "सहयोगी संस्थाएँ",
     affiliations: { items: mergeAffiliations([], affiliationFiles) },
     newsletterTitle: "न्यूज़लेटर",
@@ -261,14 +261,16 @@ export const getPublicPageData = cache(async function getPublicPageData() {
       topics: safeStringArray(c.topics),
       activities: safeStringArray(c.activities),
     })),
-    team: filterPublicTeamMembers(team).map((m) => ({
-      id: m.id,
-      nameHi: m.nameHi,
-      designation: m.designation,
-      description: m.description,
-      photoUrl: m.photoUrl,
-      isFounder: m.isFounder,
-    })),
+    team: filterPublicTeamMembers(team).map((m) =>
+      mapPublicTeamMember({
+        id: m.id,
+        nameHi: m.nameHi,
+        designation: m.designation,
+        description: m.description,
+        photoUrl: m.photoUrl,
+        isFounder: m.isFounder,
+      })
+    ),
     blogPosts: posts,
     programsSection: mergeProgramsSection(
       parseJson<Partial<ProgramsSectionBody>>(programsSec?.body ?? "{}", {})

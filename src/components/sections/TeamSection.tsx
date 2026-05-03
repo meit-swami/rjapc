@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { SectionTitle } from "@/components/SectionTitle";
 import { Reveal } from "@/components/Reveal";
+import { isExcludedFromHomepageTeam } from "@/lib/team-filter";
 
 export type TeamCard = {
   id: string;
@@ -15,6 +16,7 @@ export type TeamCard = {
 export function TeamSection({ team }: { team: TeamCard[] }) {
   const uniqueTopTeam = team
     .filter((m) => m.nameHi !== "अन्य सदस्य")
+    .filter((m) => !isExcludedFromHomepageTeam(m.nameHi))
     .filter((m, idx, arr) => arr.findIndex((x) => x.nameHi === m.nameHi) === idx)
     .slice(0, 4);
 
