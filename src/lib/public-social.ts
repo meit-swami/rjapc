@@ -1,4 +1,5 @@
 import type { ContactBody } from "@/lib/content-types";
+import { whatsappMeUrl } from "@/lib/whatsapp-public";
 
 export type PublicSocialUrls = {
   instagram?: string;
@@ -17,8 +18,7 @@ function trimUrl(u: unknown): string | undefined {
 
 /** Env-only fallback when SocialLinks is used without CMS merge (e.g. tests). */
 export function socialUrlsFromEnv(): PublicSocialUrls {
-  const waFromEnv = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER?.trim();
-  const whatsappFromEnv = waFromEnv ? `https://wa.me/${waFromEnv.replace(/\D/g, "")}` : undefined;
+  const whatsappFromEnv = whatsappMeUrl();
 
   return {
     instagram: trimUrl(process.env.NEXT_PUBLIC_INSTAGRAM_URL),
@@ -32,8 +32,7 @@ export function socialUrlsFromEnv(): PublicSocialUrls {
 
 /** Prefer CMS contact JSON, then public env vars. */
 export function mergePublicSocialUrls(body: ContactBody): PublicSocialUrls {
-  const waFromEnv = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER?.trim();
-  const whatsappFromEnv = waFromEnv ? `https://wa.me/${waFromEnv.replace(/\D/g, "")}` : undefined;
+  const whatsappFromEnv = whatsappMeUrl();
 
   return {
     instagram:

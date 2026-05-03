@@ -1,10 +1,9 @@
 "use client";
 
-const num = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "";
+import { whatsappMeUrl } from "@/lib/whatsapp-public";
 
 export function WhatsAppFloat() {
-  if (!num) return null;
-  const href = `https://wa.me/${num.replace(/\D/g, "")}`;
+  const href = whatsappMeUrl();
   return (
     <a
       href={href}

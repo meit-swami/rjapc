@@ -37,7 +37,7 @@ npm run dev
 | `JWT_SECRET` | प्रशासक सत्र हस्ताक्षर (उत्पादन में लंबा यादृच्छिक) |
 | `ADMIN_EMAIL` / `ADMIN_PASSWORD` | सीड द्वारा बनाया गया प्रशासक |
 | `NEXT_PUBLIC_SITE_URL` | कैनोनिकल URL (SEO, मेटाडेटा) |
-| `NEXT_PUBLIC_WHATSAPP_NUMBER` | WhatsApp फ्लोट बटन (देश कोड सहित, उदा. `9198...`) |
+| `NEXT_PUBLIC_WHATSAPP_NUMBER` | WhatsApp (फ्लोट + लिंक); देश कोड सहित, उदा. `918005909134`. खाली होने पर यही डिफ़ॉल्ट। |
 
 ## परियोजना संरचना (संक्षेप)
 

@@ -1,35 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { buildFeedbackWhatsAppMessage, whatsappMeUrl } from "@/lib/whatsapp-public";
 
 export function ContactForm() {
-  const [status, setStatus] = useState<"idle" | "loading" | "ok" | "err">("idle");
-  const [msg, setMsg] = useState("");
-
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setStatus("loading");
     const fd = new FormData(e.currentTarget);
-    const body = {
-      name: String(fd.get("name") ?? ""),
-      email: String(fd.get("email") ?? ""),
-      phone: String(fd.get("phone") ?? "") || undefined,
-      message: String(fd.get("message") ?? ""),
+    const fields = {
+      name: String(fd.get("name") ?? "").trim(),
+      email: String(fd.get("email") ?? "").trim(),
+      phone: String(fd.get("phone") ?? ""),
+      message: String(fd.get("message") ?? "").trim(),
     };
-    try {
-      const res = await fetch("/api/public/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      if (!res.ok) throw new Error();
-      setStatus("ok");
-      setMsg("धन्यवाद! आपका संदेश प्राप्त हो गया।");
-      e.currentTarget.reset();
-    } catch {
-      setStatus("err");
-      setMsg("त्रुटि हुई। कृपया पुनः प्रयास करें।");
-    }
+    if (!fields.name || !fields.email || !fields.message) return;
+
+    const text = buildFeedbackWhatsAppMessage(fields);
+    const url = whatsappMeUrl(text);
+    window.open(url, "_blank", "noopener,noreferrer");
   }
 
   return (
@@ -68,14 +55,15 @@ export function ContactForm() {
           className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 outline-none ring-saffron/30 focus:ring-2 font-devanagari"
         />
       </div>
+      <p className="text-xs leading-relaxed text-slate-500 font-devanagari">
+        सबमिट करने पर WhatsApp खुलेगा — वही पाठ भेजने के लिए वहाँ «भेजें» दबाएँ।
+      </p>
       <button
         type="submit"
-        disabled={status === "loading"}
-        className="rounded-xl bg-saffron py-3 font-semibold text-white transition hover:bg-saffron-dark disabled:opacity-60 font-devanagari"
+        className="rounded-xl bg-saffron py-3 font-semibold text-white transition hover:bg-saffron-dark font-devanagari"
       >
-        {status === "loading" ? "भेजा जा रहा है…" : "संदेश भेजें"}
+        WhatsApp पर भेजें
       </button>
-      {msg ? <p className="text-center text-sm text-slate-600 font-devanagari">{msg}</p> : null}
     </form>
   );
 }

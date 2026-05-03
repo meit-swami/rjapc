@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { SectionTitle } from "@/components/SectionTitle";
 import { ContactForm } from "@/components/ContactForm";
 import { Reveal } from "@/components/Reveal";
@@ -5,6 +6,7 @@ import { SocialLinks } from "@/components/SocialLinks";
 import { phoneLineToTelHref } from "@/lib/contact-display";
 import type { ContactAddressBlock } from "@/lib/content-types";
 import type { PublicSocialUrls } from "@/lib/public-social";
+import { WHATSAPP_GROUP_INVITE_URL, WHATSAPP_GROUP_QR_SRC } from "@/lib/whatsapp-public";
 
 export function ContactSection({
   addressBlocks,
@@ -46,6 +48,41 @@ export function ContactSection({
                 ))}
               </ul>
               <SocialLinks className="mt-8" urls={socialUrls} />
+
+              <h3 className="mt-8 text-lg font-bold text-navy font-devanagari">WhatsApp समूह</h3>
+              <p className="mt-2 text-sm text-slate-600 font-devanagari">
+                समूह से जुड़ने के लिए QR स्कैन करें या नीचे दिए लिंक पर क्लिक करें।
+              </p>
+              <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-start">
+                <a
+                  href={WHATSAPP_GROUP_INVITE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex shrink-0 rounded-xl border border-[#25D366]/30 bg-[#25D366]/5 p-3 shadow-sm transition hover:border-[#25D366]/60"
+                >
+                  <Image
+                    src={WHATSAPP_GROUP_QR_SRC}
+                    alt="WhatsApp समूह में शामिल होने हेतु QR कोड"
+                    width={168}
+                    height={168}
+                    className="h-40 w-40 object-contain"
+                    unoptimized
+                  />
+                </a>
+                <div className="min-w-0 flex-1">
+                  <a
+                    href={WHATSAPP_GROUP_INVITE_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="break-all text-sm font-semibold text-[#128C7E] underline decoration-[#25D366]/50 underline-offset-2 transition hover:text-saffron"
+                  >
+                    {WHATSAPP_GROUP_INVITE_URL}
+                  </a>
+                  <p className="mt-2 text-xs text-slate-500 font-devanagari">
+                    लिंक आपको WhatsApp में समूह आमंत्रण खोलेगा।
+                  </p>
+                </div>
+              </div>
             </div>
           </Reveal>
           <Reveal delay={120}>
