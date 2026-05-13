@@ -360,6 +360,15 @@ async function main() {
       isFounder: false,
       photoUrl: "/uploads/Person/2.jpg",
     },
+    {
+      nameHi: "Dr. Naresh Bashishtha",
+      designation: "राष्ट्रीय मार्गदर्शक",
+      description:
+        "राष्ट्रीय स्तर पर संस्था के मार्गदर्शन, परामर्श एवं नीति-दिशा निर्धारण में सक्रिय सहयोग।",
+      sortOrder: 10,
+      isFounder: false,
+      photoUrl: "/uploads/Person/Dr-Naresh.jpg",
+    },
   ];
 
   /** Match seed row to DB by current `nameHi`, or legacy name after rename (नाम बदलने पर भी एक ही रिकॉर्ड अपडेट हो). */
