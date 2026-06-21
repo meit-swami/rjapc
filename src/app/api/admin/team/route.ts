@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, unauthorized } from "@/lib/api-admin";
 import { z } from "zod";
@@ -37,5 +38,7 @@ export async function POST(req: Request) {
       isFounder: parsed.data.isFounder ?? false,
     },
   });
+  revalidatePath("/team");
+  revalidatePath("/");
   return NextResponse.json(m);
 }
