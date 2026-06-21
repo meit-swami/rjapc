@@ -361,13 +361,13 @@ async function main() {
       photoUrl: "/uploads/Person/2.jpg",
     },
     {
-      nameHi: "Dr. Naresh Bashishtha",
+      nameHi: "Dr Naresh Vashishtha",
       designation: "राष्ट्रीय मार्गदर्शक",
       description:
         "राष्ट्रीय स्तर पर संस्था के मार्गदर्शन, परामर्श एवं नीति-दिशा निर्धारण में सक्रिय सहयोग।",
       sortOrder: 10,
       isFounder: false,
-      photoUrl: "/uploads/Person/Dr-Naresh.jpg",
+      photoUrl: "/uploads/Person/Dr-Naresh-bashishtha.jpeg",
     },
   ];
 
@@ -375,6 +375,7 @@ async function main() {
   function seedLookupWhere(nameHi: string) {
     const legacyByNewName: Record<string, string> = {
       "Lokesh K. Sharma": "Lokesh Kumar Sharma",
+      "Dr Naresh Vashishtha": "Dr. Naresh Bashishtha",
     };
     const legacy = legacyByNewName[nameHi];
     return legacy
