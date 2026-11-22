@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, unauthorized } from "@/lib/api-admin";
+import { revalidatePublicSite } from "@/lib/revalidate-public";
 import { z } from "zod";
 
 const patchSchema = z.object({
@@ -48,6 +49,7 @@ export async function PATCH(req: Request, { params }: Params) {
     where: { id },
     data: update,
   });
+  revalidatePublicSite();
   return NextResponse.json(c);
 }
 
@@ -55,5 +57,6 @@ export async function DELETE(_req: Request, { params }: Params) {
   if (!(await requireAdmin())) return unauthorized();
   const { id } = await params;
   await prisma.course.delete({ where: { id } });
+  revalidatePublicSite();
   return NextResponse.json({ ok: true });
 }

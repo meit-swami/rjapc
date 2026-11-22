@@ -121,10 +121,29 @@ export type SiteChromeBody = {
   };
 };
 
+function isPlainObject(v: unknown): v is Record<string, unknown> {
+  return typeof v === "object" && v !== null && !Array.isArray(v);
+}
+
+/**
+ * Parses a stored JSON body. When the fallback is an object, fields missing (or null)
+ * in the stored JSON keep their fallback value, so a deleted section or a partial edit
+ * like `{}` can't leave e.g. `paragraphs` undefined and crash the page.
+ */
 export function parseJson<T>(raw: string, fallback: T): T {
+  let parsed: unknown;
   try {
-    return JSON.parse(raw) as T;
+    parsed = JSON.parse(raw);
   } catch {
     return fallback;
   }
+  if (isPlainObject(fallback)) {
+    if (!isPlainObject(parsed)) return fallback;
+    const merged: Record<string, unknown> = { ...fallback };
+    for (const [k, v] of Object.entries(parsed)) {
+      if (v !== undefined && v !== null) merged[k] = v;
+    }
+    return merged as T;
+  }
+  return (parsed ?? fallback) as T;
 }

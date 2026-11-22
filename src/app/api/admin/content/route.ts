@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, unauthorized } from "@/lib/api-admin";
+import { revalidatePublicSite } from "@/lib/revalidate-public";
 import { z } from "zod";
 
 const createSchema = z.object({
@@ -30,6 +31,7 @@ export async function POST(req: Request) {
         body: parsed.data.body,
       },
     });
+    revalidatePublicSite();
     return NextResponse.json(row);
   } catch {
     return NextResponse.json({ error: "यह कुंजी पहले से मौजूद है" }, { status: 409 });

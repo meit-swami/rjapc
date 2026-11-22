@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, unauthorized } from "@/lib/api-admin";
+import { revalidatePublicSite } from "@/lib/revalidate-public";
 import { z } from "zod";
 
 const createSchema = z.object({
@@ -38,7 +38,6 @@ export async function POST(req: Request) {
       isFounder: parsed.data.isFounder ?? false,
     },
   });
-  revalidatePath("/team");
-  revalidatePath("/");
+  revalidatePublicSite();
   return NextResponse.json(m);
 }

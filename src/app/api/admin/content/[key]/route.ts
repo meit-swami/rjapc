@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, unauthorized } from "@/lib/api-admin";
+import { revalidatePublicSite } from "@/lib/revalidate-public";
 import { z } from "zod";
 
 const bodySchema = z.object({
@@ -30,6 +31,7 @@ export async function PUT(req: Request, { params }: Params) {
       body: parsed.data.body,
     },
   });
+  revalidatePublicSite();
   return NextResponse.json(row);
 }
 
@@ -38,6 +40,7 @@ export async function DELETE(_req: Request, { params }: Params) {
   const { key } = await params;
   try {
     await prisma.contentSection.delete({ where: { key } });
+    revalidatePublicSite();
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: "नहीं मिला" }, { status: 404 });

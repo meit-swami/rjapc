@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, unauthorized } from "@/lib/api-admin";
+import { revalidatePublicSite } from "@/lib/revalidate-public";
 import { z } from "zod";
 
 const createSchema = z.object({
@@ -39,5 +40,6 @@ export async function POST(req: Request) {
       published: parsed.data.published ?? true,
     },
   });
+  revalidatePublicSite();
   return NextResponse.json(c);
 }
