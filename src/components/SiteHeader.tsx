@@ -121,7 +121,8 @@ export function SiteHeader({ chrome }: { chrome: SiteChromeBody }) {
         </nav>
         <div className="ml-auto flex shrink-0 items-center gap-2 lg:ml-0">
           <div
-            className="inline-flex items-center rounded-full border border-slate-200 bg-white p-1 shadow-sm"
+            className="notranslate inline-flex items-center rounded-full border border-slate-200 bg-white p-1 shadow-sm"
+            translate="no"
             role="tablist"
             aria-label="Language switcher"
           >

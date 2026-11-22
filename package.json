@@ -9,6 +9,8 @@
     "lint": "next lint",
     "db:push": "prisma db push",
     "db:seed": "prisma db seed",
+    "db:sync-team": "tsx prisma/sync-team.ts",
+    "admin:password": "tsx prisma/set-admin-password.ts",
     "postinstall": "prisma generate"
   },
   "prisma": {

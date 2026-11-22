@@ -3,12 +3,30 @@ import * as jose from "jose";
 import bcrypt from "bcryptjs";
 
 const COOKIE = "rjapc_admin";
-const JWT_SECRET = process.env.JWT_SECRET ?? "dev-only-secret-change-me";
+const DEV_ONLY_SECRET = "dev-only-secret-change-me-dev-only-secret";
+export const MIN_JWT_SECRET_LENGTH = 32;
 
 export type AdminJwtPayload = { sub: string; email: string };
 
+export class MissingJwtSecretError extends Error {
+  constructor() {
+    super(
+      `JWT_SECRET must be set to a random string of at least ${MIN_JWT_SECRET_LENGTH} characters in production.`
+    );
+    this.name = "MissingJwtSecretError";
+  }
+}
+
+/**
+ * Admin sessions are signed with JWT_SECRET. In production there is no fallback:
+ * a missing or short secret means nobody can log in (fail closed), instead of every
+ * deployment sharing a secret that is written in this repository.
+ */
 function getSecretKey() {
-  return new TextEncoder().encode(JWT_SECRET);
+  const secret = process.env.JWT_SECRET?.trim() ?? "";
+  if (secret.length >= MIN_JWT_SECRET_LENGTH) return new TextEncoder().encode(secret);
+  if (process.env.NODE_ENV === "production") throw new MissingJwtSecretError();
+  return new TextEncoder().encode(DEV_ONLY_SECRET);
 }
 
 export async function signAdminToken(payload: AdminJwtPayload): Promise<string> {

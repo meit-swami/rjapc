@@ -11,6 +11,7 @@ const links = [
   { href: "/admin/blog", label: "ब्लॉग" },
   { href: "/admin/contacts", label: "संपर्क संदेश" },
   { href: "/admin/newsletter", label: "न्यूज़लेटर" },
+  { href: "/admin/password", label: "पासवर्ड बदलें" },
 ];
 
 export function AdminShell({ children }: { children: React.ReactNode }) {

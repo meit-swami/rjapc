@@ -6,14 +6,33 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useLayoutEffect,
   useMemo,
   useRef,
   useState,
   type ReactNode,
 } from "react";
 
+/**
+ * Site language.
+ *
+ * Page content is written in Hindi; English is produced by the Google Translate
+ * website widget. How it works:
+ *  - English is the default for visitors who have not picked a language.
+ *  - The choice lives in localStorage ("site-language") and in the `googtrans`
+ *    cookie, which the widget reads when it starts and then translates the page.
+ *  - The widget script is only loaded while English is selected.
+ *  - Switching to English never reloads. Switching back to Hindi reloads once,
+ *    because only a fresh page restores the original text reliably.
+ *  - Nothing ever reloads on its own. (The old code reloaded whenever the widget's
+ *    hidden dropdown had not appeared yet, which never happens with the SIMPLE
+ *    layout, so English visitors were stuck in a reload loop, worst on mobile.)
+ */
+
 type Language = "hi" | "en";
+
+const STORAGE_KEY = "site-language";
+const DEFAULT_LANGUAGE: Language = "en";
+const GOOGTRANS_EN = "/hi/en";
 
 type LanguageContextValue = {
   language: Language;
@@ -22,197 +41,171 @@ type LanguageContextValue = {
 
 const LanguageContext = createContext<LanguageContextValue | null>(null);
 
+type TranslateElementCtor = new (options: Record<string, unknown>, elementId: string) => unknown;
+
 declare global {
   interface Window {
     googleTranslateElementInit?: () => void;
-    google?: {
-      translate?: {
-        TranslateElement?: new (
-          options: Record<string, unknown>,
-          elementId: string
-        ) => unknown;
-        TranslateElementInlineLayout?: { SIMPLE: number };
-      };
-    };
+    google?: { translate?: { TranslateElement?: TranslateElementCtor } };
+    __rjapcTranslatorDomGuard?: boolean;
   }
 }
 
-const GOOGTRANS_EXPIRED = "expires=Thu, 01 Jan 1970 00:00:00 GMT";
+/**
+ * Translators (the widget, or Chrome's own "Translate this page") swap React's text
+ * nodes for their own. React then crashes with "removeChild/insertBefore: the node
+ * is not a child of this node" on the next update. Ignore those two cases instead
+ * of crashing (workaround from facebook/react#11538).
+ */
+function installTranslatorDomGuard() {
+  if (typeof window === "undefined" || typeof Node !== "function") return;
+  if (window.__rjapcTranslatorDomGuard) return;
+  window.__rjapcTranslatorDomGuard = true;
 
-function clearGoogtransCookies() {
-  document.cookie = `googtrans=; path=/; ${GOOGTRANS_EXPIRED}`;
-  const host = window.location.hostname;
-  if (host && host !== "localhost" && host !== "127.0.0.1") {
-    document.cookie = `googtrans=; domain=${host}; path=/; ${GOOGTRANS_EXPIRED}`;
-  }
-}
-
-function setGoogtransCookies(fromTo: string) {
-  document.cookie = `googtrans=${fromTo}; path=/`;
-  const host = window.location.hostname;
-  if (host && host !== "localhost" && host !== "127.0.0.1") {
-    document.cookie = `googtrans=${fromTo}; domain=${host}; path=/`;
-  }
-}
-
-function fireComboChange(combo: HTMLSelectElement) {
-  combo.dispatchEvent(new Event("change", { bubbles: true }));
-  combo.dispatchEvent(new InputEvent("input", { bubbles: true }));
-}
-
-function selectOriginalLanguage(combo: HTMLSelectElement): boolean {
-  const opts = Array.from(combo.options);
-  const emptyIdx = opts.findIndex((o) => o.value === "");
-  if (emptyIdx >= 0) {
-    combo.selectedIndex = emptyIdx;
-    fireComboChange(combo);
-    return true;
-  }
-  if (opts.length > 0) {
-    combo.selectedIndex = 0;
-    fireComboChange(combo);
-    return true;
-  }
-  return false;
-}
-
-function selectEnglishTranslation(combo: HTMLSelectElement): boolean {
-  const candidates = ["en", "en|hi", "hi|en", "/en/en", "/hi/en"];
-  for (const v of candidates) {
-    const idx = Array.from(combo.options).findIndex((o) => o.value === v);
-    if (idx >= 0) {
-      combo.selectedIndex = idx;
-      fireComboChange(combo);
-      return true;
-    }
-  }
-  for (let i = 0; i < combo.options.length; i++) {
-    const o = combo.options[i];
-    const t = (o.textContent || "").toLowerCase();
-    if (t.includes("english") && o.value !== "") {
-      combo.selectedIndex = i;
-      fireComboChange(combo);
-      return true;
-    }
-  }
-  return false;
-}
-
-function tryApplyViaCombo(lang: Language): boolean {
-  const combo = document.querySelector(".goog-te-combo") as HTMLSelectElement | null;
-  if (!combo || combo.options.length === 0) return false;
-  if (lang === "hi") {
-    return selectOriginalLanguage(combo);
-  }
-  return selectEnglishTranslation(combo);
-}
-
-function applyGoogleLanguage(lang: Language, allowReload: boolean) {
-  if (typeof window === "undefined") return;
-
-  if (lang === "hi") {
-    clearGoogtransCookies();
-  } else {
-    setGoogtransCookies("/hi/en");
-  }
-
-  let tries = 0;
-  const maxTries = 8;
-  const run = () => {
-    if (tryApplyViaCombo(lang)) return;
-    tries += 1;
-    if (tries >= maxTries) {
-      if (allowReload) window.location.reload();
-      return;
-    }
-    window.setTimeout(run, 100 * tries);
+  const originalRemoveChild = Node.prototype.removeChild;
+  Node.prototype.removeChild = function <T extends Node>(this: Node, child: T): T {
+    if (child.parentNode !== this) return child;
+    return originalRemoveChild.call(this, child) as T;
   };
-  run();
+
+  const originalInsertBefore = Node.prototype.insertBefore;
+  Node.prototype.insertBefore = function <T extends Node>(
+    this: Node,
+    newNode: T,
+    referenceNode: Node | null
+  ): T {
+    if (referenceNode && referenceNode.parentNode !== this) return newNode;
+    return originalInsertBefore.call(this, newNode, referenceNode) as T;
+  };
 }
 
-function getSavedLanguage(): Language {
-  if (typeof window === "undefined") return "hi";
-  const stored = window.localStorage.getItem("site-language");
-  return stored === "en" ? "en" : "hi";
+installTranslatorDomGuard();
+
+/** Host-only cookie plus every parent domain (www.rjapc.org → www.rjapc.org, rjapc.org). */
+function cookieDomains(): (string | null)[] {
+  const host = window.location.hostname;
+  const domains: (string | null)[] = [null];
+  const isIp = /^[\d.]+$/.test(host) || host.includes(":");
+  if (host && host !== "localhost" && !isIp) {
+    const parts = host.split(".");
+    for (let i = 0; i <= parts.length - 2; i++) domains.push(parts.slice(i).join("."));
+  }
+  return domains;
+}
+
+function clearGoogtrans() {
+  for (const d of cookieDomains()) {
+    const domain = d ? `; domain=${d}` : "";
+    document.cookie = `googtrans=; path=/${domain}; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+  }
+}
+
+function setGoogtransEnglish() {
+  // Drop stale copies the widget may have written on a parent domain, then set ours.
+  clearGoogtrans();
+  document.cookie = `googtrans=${GOOGTRANS_EN}; path=/; max-age=31536000; SameSite=Lax`;
+}
+
+function readSavedLanguage(): Language | null {
+  try {
+    const v = window.localStorage.getItem(STORAGE_KEY);
+    return v === "en" || v === "hi" ? v : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveLanguage(lang: Language) {
+  try {
+    window.localStorage.setItem(STORAGE_KEY, lang);
+  } catch {
+    /* private mode etc. — the cookie still carries the choice for this visit */
+  }
+}
+
+/** If the widget is already on the page, switch it to English without a reload. */
+function selectEnglishInWidget(): boolean {
+  const combo = document.querySelector<HTMLSelectElement>("select.goog-te-combo");
+  if (!combo) return false;
+  const idx = Array.from(combo.options).findIndex((o) => o.value === "en");
+  if (idx < 0) return false;
+  combo.selectedIndex = idx;
+  combo.dispatchEvent(new Event("change", { bubbles: true }));
+  return true;
 }
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<Language>("hi");
-  const [translatorReady, setTranslatorReady] = useState(false);
-  const translateMounted = useRef(false);
-  const languageChangeFromUser = useRef(false);
-  const bootstrapEnglishDone = useRef(false);
+  const [language, setLanguageState] = useState<Language>(DEFAULT_LANGUAGE);
+  const [resolved, setResolved] = useState(false);
+  const languageRef = useRef<Language>(DEFAULT_LANGUAGE);
+  const widgetMounted = useRef(false);
 
+  // Resolve the visitor's language once, on the client.
   useEffect(() => {
-    const saved = getSavedLanguage();
-    setLanguageState(saved);
-    if (saved === "en") setGoogtransCookies("/hi/en");
-    else clearGoogtransCookies();
+    const lang = readSavedLanguage() ?? DEFAULT_LANGUAGE;
+    languageRef.current = lang;
+    if (lang === "en") setGoogtransEnglish();
+    else clearGoogtrans();
+    setLanguageState(lang);
+    setResolved(true);
   }, []);
 
   useEffect(() => {
-    document.documentElement.lang = language === "en" ? "en" : "hi";
+    document.documentElement.lang = language;
   }, [language]);
 
-  useLayoutEffect(() => {
+  // Called by Google's script once it has loaded.
+  useEffect(() => {
     window.googleTranslateElementInit = () => {
-      if (translateMounted.current) return;
-      if (!window.google?.translate?.TranslateElement) return;
-      translateMounted.current = true;
-
-      const TE = window.google.translate.TranslateElement as unknown as {
-        new (options: Record<string, unknown>, elementId: string): unknown;
-        InlineLayout?: { SIMPLE: number };
-      };
-
-      const layout = TE.InlineLayout?.SIMPLE;
-
-      new TE(
-        {
-          pageLanguage: "hi",
-          includedLanguages: "en",
-          autoDisplay: false,
-          ...(layout !== undefined ? { layout } : {}),
-        },
+      const TranslateElement = window.google?.translate?.TranslateElement;
+      if (widgetMounted.current || !TranslateElement) return;
+      widgetMounted.current = true;
+      // The widget reads this cookie at start-up; make sure it reflects the current choice.
+      if (languageRef.current === "en") setGoogtransEnglish();
+      else clearGoogtrans();
+      new TranslateElement(
+        { pageLanguage: "hi", includedLanguages: "en", autoDisplay: false },
         "google_translate_element"
       );
-      setTranslatorReady(true);
     };
   }, []);
 
-  useEffect(() => {
-    if (!translatorReady) return;
-    const userClicked = languageChangeFromUser.current;
-    languageChangeFromUser.current = false;
-
-    const firstTimeEnglish = language === "en" && !bootstrapEnglishDone.current;
-    if (language === "en") bootstrapEnglishDone.current = true;
-
-    applyGoogleLanguage(language, userClicked || firstTimeEnglish);
-  }, [language, translatorReady]);
-
   const setLanguage = useCallback((lang: Language) => {
-    languageChangeFromUser.current = true;
-    setLanguageState(lang);
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem("site-language", lang);
-      if (lang === "en") setGoogtransCookies("/hi/en");
-      else clearGoogtransCookies();
+    if (lang === languageRef.current) return;
+    languageRef.current = lang;
+    saveLanguage(lang);
+
+    if (lang === "hi") {
+      clearGoogtrans();
+      if (widgetMounted.current) {
+        // Only a fresh page gives back the original Hindi text reliably.
+        window.location.reload();
+        return;
+      }
+      setLanguageState("hi");
+      return;
     }
+
+    setGoogtransEnglish();
+    setLanguageState("en");
+    // Widget already loaded → switch it in place. Otherwise rendering <Script>
+    // below loads it and it translates from the cookie on start-up.
+    selectEnglishInWidget();
   }, []);
 
-  const value = useMemo(
-    () => ({
-      language,
-      setLanguage,
-    }),
-    [language, setLanguage]
-  );
+  const value = useMemo(() => ({ language, setLanguage }), [language, setLanguage]);
+  const loadWidget = resolved && language === "en";
 
   return (
     <LanguageContext.Provider value={value}>
-      <div id="google_translate_element" />
-      <Script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" />
+      <div id="google_translate_element" className="notranslate" translate="no" />
+      {loadWidget && (
+        <Script
+          id="google-translate-widget"
+          src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
+          strategy="afterInteractive"
+        />
+      )}
       {children}
     </LanguageContext.Provider>
   );
